@@ -123,4 +123,13 @@ public class SpriteTurnSegments : MonoBehaviour
     {
         visible = false;
     }
+
+    public void forceHideAndDisable()
+    {
+        for (int i = 0; i < segments.Length; ++i)
+        {
+            segments[i].forceHideAndDisable();
+        }
+        enabled = false;
+    }
 }

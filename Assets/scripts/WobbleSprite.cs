@@ -25,7 +25,7 @@ public class WobbleSprite: MonoBehaviour
     {
         if(_visible && sprites.Length > 1)
         {
-            int nextActiveIndex = Tools.getRandomIntExcluding(0, sprites.Length - 1, activeIndex);
+            int nextActiveIndex = Tools.GetRandomIntExcluding(0, sprites.Length - 1, activeIndex);
             sprites[activeIndex].enabled = false;
             sprites[nextActiveIndex].enabled = true;
             activeIndex = nextActiveIndex;
@@ -61,4 +61,13 @@ public class WobbleSprite: MonoBehaviour
 	{
         visible = false;
 	}
+
+    public void forceHideAndDisable()
+    {
+		for (int i = 0; i < sprites.Length; ++i)
+        {
+            sprites[i].enabled = false;
+        }
+        enabled = false;
+    }
 }

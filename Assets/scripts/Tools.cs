@@ -153,7 +153,7 @@ public class Tools
         return newValue;
     }
 
-    public static int getRandomIntExcluding(int inclusiveMin, int inclusiveMax, int numToExclude)
+    public static int GetRandomIntExcluding(int inclusiveMin, int inclusiveMax, int numToExclude)
     {
         int rangeSize = inclusiveMax - (inclusiveMin - 1);
 
@@ -171,5 +171,17 @@ public class Tools
         {
             return (n + 1);
         }
+    }
+
+    public static float Damp(float a, float b, float smoothing, float deltaTime)
+    {
+        // smoothing rate dictates the proportion of source remaining after one second
+        // https://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/
+        return Mathf.Lerp(a, b, 1 - Mathf.Pow(smoothing, deltaTime));
+    }
+
+    public static Vector3 DampVec3(Vector3 a, Vector3 b, float smoothing, float deltaTime)
+    {
+        return Vector3.Lerp(a, b, 1 - Mathf.Pow(smoothing, deltaTime));
     }
 }
