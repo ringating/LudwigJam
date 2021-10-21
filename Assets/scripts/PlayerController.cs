@@ -29,9 +29,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public float fallSpeedToPlummet = 60f;
     public float maxFallSpeed = 100f;
 
-    public Rigidbody rb;
-    public CapsuleCollider capsuleCol;
-    public SphereCollider[] sphereCols;
+    public CharacterController controller;
     public SpriteTurnSegmentsAnimation runAnimation;
     public SpriteTurnSegmentsAnimation dodgeAnimation;
     public SpriteTurnSegments idlePose;
@@ -43,6 +41,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public WobbleSprite chargeSprite; // forces over-shoulder camera, so it's literally just 1 sprite
     public WobbleSprite crosshairSprite;
 
+    private Vector3 velocity;
     private Vector3 prevPosition;
     private PlayerState prevState;
     [HideInInspector]
@@ -50,7 +49,6 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     private LayerMask terrainMask;
     private const float runSpeedThreshold = 0.01f; // used to switch between idle and running visuals
-    private bool grounded = false;
 
     void Start()
     {
@@ -75,26 +73,21 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     void Update()
     {
-        Vector3 velHorizontalOnly = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        Vector3 velHorizontalOnly = new Vector3(velocity.x, 0, velocity.z);
         //print(velHorizontalOnly.magnitude);
 
         if (velHorizontalOnly.magnitude > 0.001f)
         {
             //print(rb.rotation.eulerAngles);
             Quaternion newRotation = Quaternion.LookRotation(-velHorizontalOnly);
-            rb.MoveRotation(newRotation);
+            transform.rotation = newRotation;
         }
 
         UpdateAccordingToState();
 
         prevPosition = transform.position;
-    }
 
-	private void FixedUpdate()
-	{
-        FixedUpdateAccordingToState();
-        rb.angularVelocity = Vector3.zero;
-        AvoidCollision();
+        controller.Move(velocity * Time.deltaTime);
     }
 
 
@@ -173,64 +166,24 @@ public class PlayerController : CanReceiveMessageFromAnimation
 		switch (currState)
         {
             case PlayerState.idle:
-                UpdateSharedBetweenIdleAndRun(grounded);
+                velocity = getDesiredVelocity(runSpeed);
+                if (velocity.magnitude >= runSpeedThreshold) ChangeState(PlayerState.run);
+
+                UpdateSharedBetweenIdleAndRun(controller.isGrounded);
                 break;
 
             case PlayerState.run:
-                UpdateSharedBetweenIdleAndRun(grounded);
+                velocity = getDesiredVelocity(runSpeed);
+                if (velocity.magnitude < runSpeedThreshold) ChangeState(PlayerState.idle);
+
+                UpdateSharedBetweenIdleAndRun(controller.isGrounded);
                 break;
 
             case PlayerState.jump:
-                break;
-
-            case PlayerState.charge:
-                break;
-
-            case PlayerState.attack:
-                break;
-
-            case PlayerState.parry:
-                break;
-
-            case PlayerState.dodge:
-                break;
-        }
-    }
-
-    private void UpdateSharedBetweenIdleAndRun(bool grounded)
-    {
-        if (grounded)
-        {
-            dodgeMaybe();
-            jumpMaybe();
-        }
-        else
-        {
-            ChangeState(PlayerState.fall);
-        }
-    }
-
-    private void FixedUpdateAccordingToState()
-    {
-        grounded = Grounded();
-
-        switch (currState)
-        {
-            case PlayerState.idle:
-                rb.velocity = getDesiredVelocity(runSpeed);
-                if (rb.velocity.magnitude >= runSpeedThreshold) ChangeState(PlayerState.run);
-                break;
-
-            case PlayerState.run:
-                rb.velocity = getDesiredVelocity(runSpeed);
-                if (rb.velocity.magnitude < runSpeedThreshold) ChangeState(PlayerState.idle);
-                break;
-
-            case PlayerState.jump:
-                if (!grounded)
+                if (!controller.isGrounded)
                 {
-                    rb.velocity = GetDesiredAirVelocity();
-                    if (rb.velocity.y <= 0) ChangeState(PlayerState.fall);
+                    velocity = GetDesiredAirVelocity();
+                    if (velocity.y <= 0) ChangeState(PlayerState.fall);
                 }
                 else
                 {
@@ -239,14 +192,14 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 break;
 
             case PlayerState.fall:
-                if (!grounded)
+                if (!controller.isGrounded)
                 {
-                    rb.velocity = GetDesiredAirVelocity();
-                    if (rb.velocity.y > 0)
+                    velocity = GetDesiredAirVelocity();
+                    if (velocity.y > 0)
                     {
                         ChangeState(PlayerState.jump);
                     }
-                    else if (rb.velocity.y < -fallSpeedToPlummet)
+                    else if (velocity.y < -fallSpeedToPlummet)
                     {
                         ChangeState(PlayerState.plummet);
                     }
@@ -267,19 +220,38 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 break;
 
             case PlayerState.dodge:
-                rb.velocity = getVelocityForward(dodgeAnimation.time < dodgeAnimation.durations[0] ? dodgeSpeedA : dodgeSpeedB);
+                velocity = getVelocityForward(dodgeAnimation.time < dodgeAnimation.durations[0] ? dodgeSpeedA : dodgeSpeedB);
                 break;
+        }
+    }
+
+    private void UpdateSharedBetweenIdleAndRun(bool grounded)
+    {
+        if (grounded)
+        {
+            bool changedState = dodgeMaybe();
+            changedState = changedState || jumpMaybe();
+
+            if (!changedState)
+            {
+                // add gravity to appease the CharacterController overlord
+                velocity += Vector3.down * gravity;
+            }
+        }
+        else
+        {
+            ChangeState(PlayerState.fall);
         }
     }
 
     private Vector3 GetDesiredAirVelocity()
     {
         // constant gravity accel
-        float y = rb.velocity.y - (gravity*Time.fixedDeltaTime);
+        float y = velocity.y - (gravity*Time.deltaTime);
 
         // gradual movement up to a horizontal max
-        Vector3 horizontalAccelVec3 = getDesiredVelocity(airControlAccel * Time.fixedDeltaTime);
-        Vector2 horiAccel = new Vector2(rb.velocity.x + horizontalAccelVec3.x, rb.velocity.z + horizontalAccelVec3.z);
+        Vector3 horizontalAccelVec3 = getDesiredVelocity(airControlAccel * Time.deltaTime);
+        Vector2 horiAccel = new Vector2(velocity.x + horizontalAccelVec3.x, velocity.z + horizontalAccelVec3.z);
         if (horiAccel.magnitude > maxHorizontalAirSpeed) horiAccel = horiAccel.normalized * maxHorizontalAirSpeed;
 
         return new Vector3(horiAccel.x, y, horiAccel.y);
@@ -326,54 +298,14 @@ public class PlayerController : CanReceiveMessageFromAnimation
         return false;
     }
 
-    private void jumpMaybe()
+    private bool jumpMaybe()
     {
         if (Input.GetButtonDown("Jump"))
         {
-            // teleport up to escape the range of the grounded check
-            rb.MovePosition(rb.position + (Vector3.up * (groundedCheckHeight + extraGroundedEscapeDistance)));
-
-            rb.velocity = new Vector3(rb.velocity.x, jumpSpeed, rb.velocity.z);
-
+            velocity = new Vector3(velocity.x, jumpSpeed, velocity.z);
             ChangeState(PlayerState.jump);
+            return true;
         }
-    }
-
-    private bool Grounded()
-    {
-        return Grounded(out RaycastHit hitInfo);
-    }
-
-    private bool Grounded(out RaycastHit hitInfo)
-    {
-        float capsuleBottomY = rb.position.y + capsuleCol.center.y - (capsuleCol.height / 2);
-
-        for (int i = 0; i < sphereCols.Length; ++i)
-        {
-            if (Physics.Raycast(transform.position + sphereCols[i].center, Vector3.down, out hitInfo, sphereCols[i].radius + groundedCheckHeight, terrainMask, QueryTriggerInteraction.Ignore))
-            {
-                return true;
-            }
-        } 
-
-        hitInfo = new RaycastHit();
         return false;
-    }
-
-    private void AvoidCollision()
-    {
-        Vector3 nextPosOfCapsule = (rb.position + capsuleCol.center) + (rb.velocity * Time.fixedDeltaTime);
-    }
-
-	private void OnDrawGizmos()
-	{
-        for (int i = 0; i < sphereCols.Length; ++i)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(
-                transform.position + sphereCols[i].center, 
-                transform.position + sphereCols[i].center + (Vector3.down * (sphereCols[i].radius + groundedCheckHeight))
-            );
-        }
     }
 }
