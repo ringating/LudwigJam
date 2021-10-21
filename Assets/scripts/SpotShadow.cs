@@ -5,7 +5,6 @@ using UnityEngine;
 public class SpotShadow : MonoBehaviour
 {
     public Transform castFrom;
-    public Rigidbody shadowRB;
     public float hoverDistance = 0.005f;
     public float maxShadowDistance = 10f;
 
@@ -19,15 +18,20 @@ public class SpotShadow : MonoBehaviour
         layerMask = ~LayerMask.NameToLayer("terrain");
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+	// Update is called once per frame
+	void Update()
+	{
+        transform.position = new Vector3(castFrom.position.x, transform.position.y, castFrom.position.z);
+    }
+
+	void FixedUpdate()
     {
         //RaycastHit hitInfo = new RaycastHit();
         if(Physics.Raycast(castFrom.position, Vector3.down, out RaycastHit hitInfo, maxShadowDistance, layerMask, QueryTriggerInteraction.Ignore))
         {
             shadow.enabled = true;
-            shadowRB.MovePosition(hitInfo.point + new Vector3(0f, hoverDistance, 0f));
-            //transform.position = hitInfo.point + new Vector3(0f, hoverDistance, 0f);
+            Vector3 prevPos = transform.position;
+            transform.position = new Vector3(prevPos.x, hitInfo.point.y + hoverDistance, prevPos.y);
         }
 		else
         {

@@ -64,8 +64,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
         jumpPose.forceHideAndDisable();
         fallPose.forceHideAndDisable();
-        //plummetPose.forceHideAndDisable();
-        //parryPose.forceHideAndDisable();
+        plummetPose.forceHideAndDisable();
+        parryPose.forceHideAndDisable();
         //attackPose.forceHideAndDisable();
         //chargeSprite.forceHideAndDisable();
         //crosshairSprite.forceHideAndDisable();
@@ -73,16 +73,6 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     void Update()
     {
-        Vector3 velHorizontalOnly = new Vector3(velocity.x, 0, velocity.z);
-        //print(velHorizontalOnly.magnitude);
-
-        if (velHorizontalOnly.magnitude > 0.001f)
-        {
-            //print(rb.rotation.eulerAngles);
-            Quaternion newRotation = Quaternion.LookRotation(-velHorizontalOnly);
-            transform.rotation = newRotation;
-        }
-
         UpdateAccordingToState();
 
         prevPosition = transform.position;
@@ -118,8 +108,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     fallPose.forceHideAndDisable();
                     break;
 
-                case PlayerState.plummet:
-                    plummetPose.forceHideAndDisable();
+                case PlayerState.parry:
+                    parryPose.forceHideAndDisable();
                     break;
 
                 default:
@@ -153,6 +143,10 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     plummetPose.enabled = true;
                     break;
 
+                case PlayerState.parry:
+                    parryPose.enabled = true;
+                    break;
+
                 default:
                     break;
             }
@@ -176,6 +170,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 velocity = getDesiredVelocity(runSpeed);
                 if (velocity.magnitude < runSpeedThreshold) ChangeState(PlayerState.idle);
 
+                setPlayerLookDir(velocity);
                 UpdateSharedBetweenIdleAndRun(controller.isGrounded);
                 break;
 
@@ -189,6 +184,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 {
                     ChangeState(PlayerState.run);
                 }
+                setPlayerLookDir(getDesiredVelocity(1f));
                 break;
 
             case PlayerState.fall:
@@ -208,6 +204,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 {
                     ChangeState(PlayerState.run);
                 }
+                setPlayerLookDir(getDesiredVelocity(1f));
                 break;
 
             case PlayerState.charge:
@@ -279,7 +276,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
         switch (message)
         {
             case "dodge end":
-                ChangeState(PlayerState.idle);
+                ChangeState(PlayerState.jump);
                 break;
 
             default:
@@ -307,5 +304,27 @@ public class PlayerController : CanReceiveMessageFromAnimation
             return true;
         }
         return false;
+    }
+
+    /*private void rotateToFaceHorizontalVelocity()
+    {
+        Vector3 velHorizontalOnly = new Vector3(velocity.x, 0, velocity.z);
+
+        if (velHorizontalOnly.magnitude > 0.001f)
+        {
+            Quaternion newRotation = Quaternion.LookRotation(-velHorizontalOnly);
+            transform.rotation = newRotation;
+        }
+    }*/
+
+    private void setPlayerLookDir(Vector3 lookDir)
+    {
+        Vector3 velHorizontalOnly = new Vector3(lookDir.x, 0, lookDir.z);
+
+        if (velHorizontalOnly.magnitude > 0.001f)
+        {
+            Quaternion newRotation = Quaternion.LookRotation(-velHorizontalOnly);
+            transform.rotation = newRotation;
+        }
     }
 }
