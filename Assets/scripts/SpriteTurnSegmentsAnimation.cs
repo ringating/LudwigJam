@@ -19,7 +19,6 @@ public class SpriteTurnSegmentsAnimation : MonoBehaviour
 
     public float time { get { return timer; } private set {} } // empty private set to make VS shut up
 
-    private bool queuedStopAndReset = false;
     private string queuedMessage = "";
 
     // Start is called before the first frame update
