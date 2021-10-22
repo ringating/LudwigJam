@@ -18,6 +18,8 @@ public class CameraScript : MonoBehaviour
     public float mouseSensitivityY;
 
     public float maxDistance;
+    public bool smoothCameraPos = false;          // smooth camera snapping at the cost of often clipping through models briefly
+    public float cameraPosSmoothing = 0.00000001f; // the distance that remains after 1 sec of movement towards target pos
 
     public float yaw { get; private set; } // 0-360 degrees, where 0 is +X and 90 is +Z
     public float pitch { get; private set; }
@@ -46,10 +48,10 @@ public class CameraScript : MonoBehaviour
         }
         else
         {
-            MouseMoveCamera();
+            if (!GlobalObjects.pauseMenuStatic.paused) MouseMoveCamera();
         }
 
-        rotatingFocalPointParent.localRotation = GetCameraRotation();
+        if (!GlobalObjects.pauseMenuStatic.paused) rotatingFocalPointParent.localRotation = GetCameraRotation();
         SetCameraDistance();
     }
 
@@ -102,7 +104,14 @@ public class CameraScript : MonoBehaviour
             closestHitDistance = Mathf.Min(closestHitDistance, hit.distance);
         }
 
-        cameraTransform.localPosition = new Vector3(0, 0, -closestHitDistance);
+        if (smoothCameraPos)
+        {
+            cameraTransform.localPosition = new Vector3(0, 0, Tools.Damp(cameraTransform.localPosition.z, -closestHitDistance, cameraPosSmoothing, Time.unscaledDeltaTime) );
+        }
+        else
+        {
+            cameraTransform.localPosition = new Vector3(0, 0, -closestHitDistance);
+        }
     }
 
     private Rect GetNearClippingPlaneDimensions()

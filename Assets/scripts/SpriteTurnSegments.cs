@@ -27,7 +27,10 @@ public class SpriteTurnSegments : MonoBehaviour
 
     private void Update()
     {
-        UpdateActiveSegment();
+        if (segments.Length > 1)
+        {
+            UpdateActiveSegment();
+        }
         RotateToFaceCamera();  
     }
 
@@ -106,7 +109,10 @@ public class SpriteTurnSegments : MonoBehaviour
 
 			if (GlobalObjects.cameraScriptStatic)
             {
-                UpdateActiveSegment();
+				if (segments.Length > 1)
+                {
+                    UpdateActiveSegment();
+                }
                 RotateToFaceCamera();
             }
         }

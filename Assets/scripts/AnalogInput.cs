@@ -82,4 +82,13 @@ public struct AnalogInput
 			RightAnalog = new Vector2(Input.GetAxisRaw("Look Horizontal"), Input.GetAxisRaw("Look Vertical"))
 		};
     }
+
+    public static AnalogInput GetZeroInputs()
+    {
+        return new AnalogInput
+        {
+            LeftAnalog = Vector2.zero,
+            RightAnalog = Vector2.zero
+        };
+    }
 }
