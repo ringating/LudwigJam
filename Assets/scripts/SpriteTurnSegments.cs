@@ -138,4 +138,15 @@ public class SpriteTurnSegments : MonoBehaviour
         }
         enabled = false;
     }
+
+    public void SetTint(Color color)
+    {
+        for(int i = 0; i < segments.Length; ++i)
+        {
+            for (int j = 0; j < segments[i].sprites.Length; ++j)
+            {
+                segments[i].sprites[j].material.color = color;
+            }
+        }
+    }
 }

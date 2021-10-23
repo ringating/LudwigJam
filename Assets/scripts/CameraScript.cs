@@ -42,6 +42,9 @@ public class CameraScript : MonoBehaviour
 
     private void LateUpdate()
     {
+        mouseSensitivityX = SettingsStatic.sensitivity;
+        mouseSensitivityY = SettingsStatic.sensitivity;
+
         if (useController)
         {
             AnalogMoveCamera();
@@ -106,7 +109,7 @@ public class CameraScript : MonoBehaviour
 
         if (smoothCameraPos)
         {
-            cameraTransform.localPosition = new Vector3(0, 0, Tools.Damp(cameraTransform.localPosition.z, -closestHitDistance, cameraPosSmoothing, Time.unscaledDeltaTime) );
+            cameraTransform.localPosition = new Vector3(0, 0, Tools.Damp(cameraTransform.localPosition.z, -closestHitDistance, cameraPosSmoothing, Time.deltaTime) );
         }
         else
         {

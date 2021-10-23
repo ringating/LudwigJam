@@ -13,6 +13,12 @@ public class GlobalObjects : MonoBehaviour
     public PauseMenu pauseMenu;
     public static PauseMenu pauseMenuStatic;
 
+    public PlayerController player;
+    public static PlayerController playerStatic;
+
+    public TimeController timeController;
+    public static TimeController timeControllerStatic;
+
 
     // Awake is called before Start
     void Awake()
@@ -20,5 +26,7 @@ public class GlobalObjects : MonoBehaviour
         cameraScriptStatic = cameraScript;
         wobbleSpriteTimerStatic = wobbleSpriteTimer;
         pauseMenuStatic = pauseMenu;
+        playerStatic = player;
+        timeControllerStatic = timeController;
     }
 }

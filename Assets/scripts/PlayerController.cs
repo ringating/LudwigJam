@@ -18,6 +18,18 @@ public class PlayerController : CanReceiveMessageFromAnimation
     }
 
     public AudioSource chargeSoundPlayer;
+    public AudioSource generalSoundPlayer;
+    public AudioClip dashPunchSound;
+    public AudioClip dashPunchHitSound;
+    public AudioClip dodgeSound;
+    public AudioClip parrySound;
+    public AudioClip parryHitSound;
+    public AudioClip getHitSound;
+    public AudioClip jumpSound;
+    public AudioClip landingSound;
+    public AudioClip plummetBounceSound;
+
+    public Rigidbody plummeter;
 
     public float cameraDistance;
     public float cameraDistanceWhenCharging;
@@ -34,7 +46,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public float airControlAccel = 30f;
     public float maxHorizontalAirSpeed = 7f;
     public float fallSpeedToPlummet = 60f;
-    public float maxFallSpeed = 100f;
+    //public float maxFallSpeed = 100f;
     public float chargeStartupTime;
     public float maxChargeTime = 1f;
     public float maxZWobbleDuringCharge = 0.25f;
@@ -46,6 +58,11 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public float attackEndJumpSpeed = 5f;
     public float parryActiveTime = 0.25f;
     public float parryInactiveTime = 0.25f;
+    public float invulnAfterGettingHit = 1f;
+    public float plummetSpeedThresholdToRecover = 1.5f;
+    public float plummetTimeUnderSpeedToRecover = 1f;
+    public float plummetMercyRuleTime = 15f;
+    public float mercyRuleInvulnDuration = 1f;
 
     public DampFollow cameraDamp;
     public CharacterController controller;
@@ -69,9 +86,18 @@ public class PlayerController : CanReceiveMessageFromAnimation
     private LayerMask terrainMask;
     private const float runSpeedThreshold = 0.01f; // used to switch between idle and running visuals
 
-    private float timer = 0;
+    [HideInInspector]
+    public float timer = 0;
+    public float timer2 = 0;
     private float chargeDistance;
     private Vector3 chargeDirection;
+    private bool usedPunchThisAirborne = true;
+    private float timeSinceSuccessfulParry = 10f;
+    private float timeSinceSuccessfulAttack = 10f;
+    private float timeSinceHitByEnemy = 10f;
+    private bool wasGrounded = true;
+    private bool invuln = false;
+    private float timeSinceMercyRuleActivated = 0f;
 
     void Start()
     {
@@ -98,10 +124,22 @@ public class PlayerController : CanReceiveMessageFromAnimation
     void Update()
     {
         UpdateAccordingToState();
+        MaybeFadeOutChargeSound();
+
+        if (!wasGrounded && controller.isGrounded && currState != PlayerState.parry) generalSoundPlayer.PlayOneShot(landingSound, 0.3f);
+        wasGrounded = controller.isGrounded;
 
         prevPosition = transform.position;
 
-        controller.Move(velocity * Time.deltaTime);
+        if (currState != PlayerState.plummet)
+        {
+            controller.Move(velocity * Time.deltaTime);
+        }
+
+        timeSinceSuccessfulAttack += Time.unscaledDeltaTime;
+        timeSinceSuccessfulParry += Time.unscaledDeltaTime;
+        timeSinceHitByEnemy += Time.unscaledDeltaTime;
+        timeSinceMercyRuleActivated += Time.unscaledDeltaTime;
     }
 
 
@@ -145,6 +183,13 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     attackPose.forceHideAndDisable();
                     break;
 
+                case PlayerState.plummet:
+                    plummetPose.forceHideAndDisable();
+                    plummeter.gameObject.SetActive(false);
+                    controller.enabled = true;
+                    controller.detectCollisions = true;
+                    break;
+
                 default:
                     break;
             }
@@ -163,6 +208,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     dodgeAnimation.enabled = true;
                     dodgeAnimation.Play();
                     timer = 0;
+                    invuln = true;
+                    generalSoundPlayer.PlayOneShot(dodgeSound);
                     break;
 
                 case PlayerState.jump:
@@ -176,22 +223,28 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 case PlayerState.plummet:
                     plummetPose.enabled = true;
                     timer = 0;
+                    timer2 = 0;
                     break;
 
                 case PlayerState.parry:
                     parryPose.enabled = true;
                     timer = 0;
+                    generalSoundPlayer.PlayOneShot(parrySound);
                     break;
 
                 case PlayerState.charge:
                     chargeSprite.enabled = true;
                     crosshairSprite.enabled = true;
                     timer = 0;
+                    chargeSoundPlayer.volume = 1f;
+                    chargeSoundPlayer.Play();
                     break;
 
                 case PlayerState.attack:
                     attackPose.enabled = true;
                     timer = 0;
+                    generalSoundPlayer.PlayOneShot(dashPunchSound, 0.5f);
+                    usedPunchThisAirborne = true;
                     break;
 
                 default:
@@ -211,7 +264,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 velocity = getDesiredVelocity(runSpeed);
                 if (velocity.magnitude >= runSpeedThreshold) ChangeState(PlayerState.run);
 
-                UpdateSharedBetweenIdleAndRun(controller.isGrounded);
+                UpdateSharedBetweenIdleAndRun(GetGrounded());
                 break;
 
             case PlayerState.run:
@@ -219,11 +272,11 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 if (velocity.magnitude < runSpeedThreshold) ChangeState(PlayerState.idle);
 
                 setPlayerLookDir(velocity);
-                UpdateSharedBetweenIdleAndRun(controller.isGrounded);
+                UpdateSharedBetweenIdleAndRun(GetGrounded());
                 break;
 
             case PlayerState.jump:
-                if (!controller.isGrounded)
+                if (!GetGrounded())
                 {
                     velocity = GetDesiredAirVelocity();
                     if (velocity.y <= 0) ChangeState(PlayerState.fall);
@@ -238,7 +291,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 break;
 
             case PlayerState.fall:
-                if (!controller.isGrounded)
+                if (!GetGrounded())
                 {
                     velocity = GetDesiredAirVelocity();
                     if (velocity.y > 0)
@@ -277,6 +330,10 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
             case PlayerState.dodge:
                 velocity = getVelocityForward(dodgeAnimation.time < dodgeAnimation.durations[0] ? dodgeSpeedA : dodgeSpeedB);
+                break;
+
+            case PlayerState.plummet:
+                PlummetUpdate();
                 break;
         }
     }
@@ -337,6 +394,10 @@ public class PlayerController : CanReceiveMessageFromAnimation
     {
         switch (message)
         {
+            case "dodge invuln end":
+                invuln = false;
+                break;
+
             case "dodge end":
                 ChangeState(PlayerState.jump);
                 break;
@@ -363,6 +424,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
         {
             velocity = new Vector3(velocity.x, jumpSpeed, velocity.z);
             ChangeState(PlayerState.jump);
+            generalSoundPlayer.PlayOneShot(jumpSound, 1f);
             return true;
         }
         return false;
@@ -392,7 +454,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     private bool ChargeZoomMaybe()
     {
-        if (Input.GetButton("Attack") && !GlobalObjects.pauseMenuStatic.paused)
+        if (Input.GetButton("Attack") && !GlobalObjects.pauseMenuStatic.paused && !usedPunchThisAirborne)
         {
             setChargeCameraSettings();
 
@@ -488,7 +550,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
     {
         velocity += Vector3.down * gravity * Time.deltaTime;
 
-        if (controller.isGrounded)
+        if (GetGrounded())
         {
             velocity = new Vector3(0, velocity.y, 0);
         }
@@ -496,15 +558,18 @@ public class PlayerController : CanReceiveMessageFromAnimation
         if (timer < parryActiveTime)
         {
             // parrying, invinvible
+            invuln = true;
         }
         else if (timer < parryActiveTime + parryInactiveTime)
         {
             // endlag of parry, vulnerable
+            invuln = false;
         }
         else
         {
             // done parrying
             timer = 0;
+            invuln = false;
             ChangeState(PlayerState.jump);
             return;
         }
@@ -512,5 +577,109 @@ public class PlayerController : CanReceiveMessageFromAnimation
         timer += Time.deltaTime;
     }
 
-    public void OnEnemyAttackHit() { }
+    public float groundedTimeAfterParryHit = 0.5f;
+    public float groundedTimeAfterAttackHit = 0.5f;
+    private bool GetGrounded()
+    {
+        bool grounded = controller.isGrounded || timeSinceSuccessfulAttack <= groundedTimeAfterAttackHit || timeSinceSuccessfulParry <= groundedTimeAfterParryHit;
+        if (grounded) usedPunchThisAirborne = false;
+        return grounded;
+    }
+
+    public void OnEnemyAttackHit(Hazard enemy)
+    {
+        bool beenHit = timeSinceMercyRuleActivated > mercyRuleInvulnDuration; // true unless mercy rule activated
+
+        if (currState == PlayerState.attack) // attack trades, lmao
+        {
+            enemy.BeenHit();
+        }
+
+        if (currState == PlayerState.parry && timer <= parryActiveTime)
+        {
+            // successful parry!
+            GlobalObjects.timeControllerStatic.TempChangeTimescale(0.05f, 0f, 0.3f, 0f);
+            generalSoundPlayer.PlayOneShot(parryHitSound);
+            beenHit = false;
+            enemy.Parried();
+        }
+
+        if (currState == PlayerState.dodge && invuln)
+        {
+            beenHit = false;
+        }
+
+        if (beenHit && timeSinceHitByEnemy > invulnAfterGettingHit)
+        {
+            KnockedOut(enemy.transform.position, 10f, 20f);
+            timeSinceHitByEnemy = 0f;
+            generalSoundPlayer.PlayOneShot(getHitSound);
+        }
+    }
+
+    public void KnockedOut(Vector3 positionToFlyAwayFrom, float horizontalLaunchSpeed, float verticalLaunchSpeed)
+    {
+        Vector3 rawLaunchVector = (transform.position - positionToFlyAwayFrom);
+        Vector2 hor = new Vector2(rawLaunchVector.x, rawLaunchVector.z).normalized * horizontalLaunchSpeed;
+        Vector3 launchVector = new Vector3(hor.x, verticalLaunchSpeed, hor.y);
+
+        // disable character controller
+        controller.detectCollisions = false;
+        controller.enabled = false;
+        
+        // enable rigidbody and launch it
+        plummeter.gameObject.SetActive(true);
+        plummeter.transform.position = transform.position;
+        plummeter.AddForce(launchVector, ForceMode.VelocityChange);
+
+        // change to plummet state so the player actually follows the rigidbody
+        ChangeState(PlayerState.plummet);
+    }
+
+    private void MaybeFadeOutChargeSound()
+    {
+		if (currState != PlayerState.charge)
+        {
+            chargeSoundPlayer.volume = Mathf.Max(0, chargeSoundPlayer.volume - (Time.unscaledTime * 10f));
+        }
+    }
+
+    public void PlayPlummetBounceSound()
+    {
+        generalSoundPlayer.PlayOneShot(plummetBounceSound);
+    }
+
+    private void PlummetUpdate() 
+    {
+        transform.position = plummeter.transform.position;
+        //print(plummeter.velocity.magnitude);
+
+        if (plummeter.velocity.magnitude < plummetSpeedThresholdToRecover)
+        {
+            timer += Time.deltaTime;
+            if (timer > plummetTimeUnderSpeedToRecover)
+            {
+                timer = 0;
+                ChangeState(PlayerState.idle);
+            }
+        }
+        else
+        {
+            timer = 0;
+        }
+
+        if (timer2 > plummetMercyRuleTime)
+        {
+            timeSinceMercyRuleActivated = 0;
+            ChangeState(PlayerState.idle);
+        }
+
+        timer2 += Time.deltaTime;
+    }
+
+    public void HitAnEnemy(Hazard enemy)
+    {
+        //generalSoundPlayer.PlayOneShot(dashPunchHitSound, 0.5f);
+        GlobalObjects.timeControllerStatic.TempChangeTimescale(0.05f, 0f, 0.3f, 0f);
+    }
 }

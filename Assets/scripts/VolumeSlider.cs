@@ -12,6 +12,7 @@ public class VolumeSlider : MonoBehaviour
 	private void Start()
 	{
 		slider = GetComponent<Slider>();
+		slider.value = SettingsStatic.volume; // start by inheriting value from the static settings class
 		SetVolume();
 	}
 
@@ -30,6 +31,7 @@ public class VolumeSlider : MonoBehaviour
 
 	private void SetVolume()
 	{
+		SettingsStatic.volume = slider.value;
 		AudioListener.volume = slider.value;
 		prevValue = slider.value;
 		prevVolume = prevValue;

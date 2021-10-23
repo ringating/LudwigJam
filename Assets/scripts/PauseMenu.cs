@@ -9,6 +9,7 @@ public class PauseMenu : MonoBehaviour
     public GameObject controlsScreen;
     public InputField sensitivityInput;
     public Slider volumeSlider;
+    public AudioSource audioSource;
 
     private float defaultSens = 1f;
 
@@ -17,7 +18,8 @@ public class PauseMenu : MonoBehaviour
 	private void Start()
 	{
         AudioListener.volume = volumeSlider.value;
-	}
+        sensitivityInput.text = "" + SettingsStatic.sensitivity;
+    }
 
 	void Update()
     {
@@ -68,6 +70,26 @@ public class PauseMenu : MonoBehaviour
         else
         {
             Cursor.lockState = CursorLockMode.None;
+        }
+    }
+
+    public void PlayUISound()
+    {
+        audioSource.Play();
+    }
+
+    private const float cooldownUISound = 0.2f;
+    private float cooldownTimer = 0;
+    public void PlayUISoundOnCooldown()
+    {
+        if(cooldownTimer <= 0)
+        {
+            audioSource.Play();
+            cooldownTimer = cooldownUISound;
+        }
+		else 
+        {
+            cooldownTimer -= Time.deltaTime;
         }
     }
 }

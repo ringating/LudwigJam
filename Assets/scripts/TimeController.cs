@@ -4,25 +4,56 @@ using UnityEngine;
 
 public class TimeController : MonoBehaviour
 {
-    private float easeInTime;
-    private float easeOutTime;
-    private float fullyChangedDuration;
+    private float easeInTime = 0;
+    private float easeOutTime = 0;
+    private float fullyChangedDuration = 0;
 
+    private float timer = 1f;
+    private float startTimeScale;
+    private float targetTimeScale;
 
-    // Start is called before the first frame update
-    void Start()
+	private void Start()
+	{
+        startTimeScale = Time.timeScale;
+	}
+
+	// Update is called once per frame
+	void Update()
     {
-        
+        if (timer < easeInTime + fullyChangedDuration + easeOutTime)
+        {
+            if (timer < easeInTime + fullyChangedDuration)
+            {
+                if (timer < easeInTime)
+                {
+                    Time.timeScale = Mathf.Lerp(startTimeScale, targetTimeScale, timer / easeInTime);
+                }
+                else
+                {
+                    Time.timeScale = targetTimeScale;
+                }
+            }
+            else
+            {
+                Time.timeScale = Mathf.Lerp(targetTimeScale, 1f, (timer - (easeInTime + fullyChangedDuration)) / easeOutTime);
+            }
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+
+        timer += Time.unscaledDeltaTime;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void TempChangeTimescale(float targetTimeScale, float easeInTime, float fullyChangedDuration, float easeOutTime)
     {
-        
-    }
+        startTimeScale = Time.timeScale;
+        this.targetTimeScale = targetTimeScale;
+        this.easeInTime = easeInTime;
+        this.fullyChangedDuration = fullyChangedDuration;
+        this.easeOutTime = easeOutTime;
 
-    public void TempChangeTimescale(float easeInTime, float fullyChangedDuration, float easeOutTime)
-    {
-
+        timer = 0;
     }
 }
