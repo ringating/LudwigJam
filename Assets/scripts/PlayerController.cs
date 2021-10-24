@@ -31,6 +31,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     public Rigidbody plummeter;
 
+    public Color vulnerableTint;
+
     public float cameraDistance;
     public float cameraDistanceWhenCharging;
     public float cameraSmoothing;
@@ -76,6 +78,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public SpriteTurnSegments attackPose;
     public SpriteTurnSegments chargeSprite; // forces over-shoulder camera, so it's literally just 1 sprite
     public SpriteTurnSegments crosshairSprite;
+    public ShowHelperSprites helperSprites;
 
     private Vector3 velocity;
     private Vector3 prevPosition;
@@ -88,16 +91,19 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     [HideInInspector]
     public float timer = 0;
+    [HideInInspector]
     public float timer2 = 0;
     private float chargeDistance;
     private Vector3 chargeDirection;
-    private bool usedPunchThisAirborne = true;
+    [HideInInspector]
+    public bool usedPunchThisAirborne = true;
     private float timeSinceSuccessfulParry = 10f;
     private float timeSinceSuccessfulAttack = 10f;
     private float timeSinceHitByEnemy = 10f;
     private bool wasGrounded = true;
     private bool invuln = false;
     private float timeSinceMercyRuleActivated = 0f;
+    private bool parrySuccessful = false;
 
     void Start()
     {
@@ -108,6 +114,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
         currState = PlayerState.idle;
         prevState = currState;
         idlePose.enabled = true;
+
+        dodgeAnimation.toAnimate[1].SetTint(new Color(0.7f, 0.7f, 0.7f, 1));
 
         runAnimation.forceHideAndDisable();
         dodgeAnimation.forceHideAndDisable();
@@ -171,7 +179,9 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     break;
 
                 case PlayerState.parry:
+                    parryPose.SetTint(Color.white);
                     parryPose.forceHideAndDisable();
+                    timer2 = 0;
                     break;
 
                 case PlayerState.charge:
@@ -181,6 +191,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
                 case PlayerState.attack:
                     attackPose.forceHideAndDisable();
+                    usedPunchThisAirborne = true;
                     break;
 
                 case PlayerState.plummet:
@@ -224,11 +235,14 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     plummetPose.enabled = true;
                     timer = 0;
                     timer2 = 0;
+                    EnablePlummeterAndDisableController(true);
                     break;
 
                 case PlayerState.parry:
+                    parrySuccessful = false;
                     parryPose.enabled = true;
                     timer = 0;
+                    timer2 = 0;
                     generalSoundPlayer.PlayOneShot(parrySound);
                     break;
 
@@ -236,6 +250,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     chargeSprite.enabled = true;
                     crosshairSprite.enabled = true;
                     timer = 0;
+                    timer2 = 0;
                     chargeSoundPlayer.volume = 1f;
                     chargeSoundPlayer.Play();
                     break;
@@ -276,7 +291,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 break;
 
             case PlayerState.jump:
-                if (!GetGrounded())
+                if (!controller.isGrounded)
                 {
                     velocity = GetDesiredAirVelocity();
                     if (velocity.y <= 0) ChangeState(PlayerState.fall);
@@ -326,6 +341,11 @@ public class PlayerController : CanReceiveMessageFromAnimation
             case PlayerState.parry:
                 ParryUpdate();
                 setDefaultCameraSettings();
+                if (parrySuccessful)
+                {
+                    if(!jumpMaybe()) 
+                        ChargeZoomMaybe();
+                }
                 break;
 
             case PlayerState.dodge:
@@ -334,6 +354,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
             case PlayerState.plummet:
                 PlummetUpdate();
+                setDefaultCameraSettings();
                 break;
         }
     }
@@ -422,6 +443,17 @@ public class PlayerController : CanReceiveMessageFromAnimation
     {
         if (Input.GetButtonDown("Jump") && !GlobalObjects.pauseMenuStatic.paused)
         {
+            if (parrySuccessful)
+            {
+                //print("ok");
+                timeSinceSuccessfulParry = groundedTimeAfterParryHit + 1;
+            }
+
+            if (timeSinceSuccessfulAttack < groundedTimeAfterAttackHit) // hopefully this just works
+            {
+                timeSinceSuccessfulAttack = groundedTimeAfterAttackHit + 1;
+            }
+
             velocity = new Vector3(velocity.x, jumpSpeed, velocity.z);
             ChangeState(PlayerState.jump);
             generalSoundPlayer.PlayOneShot(jumpSound, 1f);
@@ -458,11 +490,11 @@ public class PlayerController : CanReceiveMessageFromAnimation
         {
             setChargeCameraSettings();
 
-            timer += Time.deltaTime;
+            timer2 += Time.deltaTime;
 
-            if (timer >= chargeStartupTime)
+            if (timer2 >= chargeStartupTime)
             {
-                timer = 0;
+                timer2 = 0;
                 ChangeState(PlayerState.charge);
             }
 
@@ -472,7 +504,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
         {
             setDefaultCameraSettings();
 
-            timer = 0;
+            timer2 = 0;
         }
 
         return false;
@@ -501,7 +533,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 Mathf.Sin(Time.time * 2 * Mathf.PI * zWobblesPerSec) * Tools.Map(timer, 0, maxChargeTime, 0, maxZWobbleDuringCharge, true)
             );
 
-			if (velocity.magnitude > maxSpeedDuringCharge)
+            if (velocity.magnitude > maxSpeedDuringCharge)
             {
                 velocity = velocity.normalized * maxSpeedDuringCharge;
             }
@@ -520,18 +552,21 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     private void AttackDashPhase()
     {
-        // in here, timer will store the DISTANCE travelled so far
-        timer += attackSpeed * Time.deltaTime;
-        if (timer < chargeDistance)
+        if (!ParryMaybe())
         {
-            velocity = chargeDirection * attackSpeed;
-        }
-        else
-        {
-            Vector2 velHor = new Vector2(velocity.x, velocity.z);
-            if (velHor.magnitude > maxHorizontalAirSpeed) velHor = velHor.normalized * maxHorizontalAirSpeed;
-            velocity = new Vector3(velHor.x, attackEndJumpSpeed, velHor.y);
-            ChangeState(PlayerState.jump);
+            // in here, timer will store the DISTANCE travelled so far
+            timer += attackSpeed * Time.deltaTime;
+            if (timer < chargeDistance)
+            {
+                velocity = chargeDirection * attackSpeed;
+            }
+            else
+            {
+                Vector2 velHor = new Vector2(velocity.x, velocity.z);
+                if (velHor.magnitude > maxHorizontalAirSpeed) velHor = velHor.normalized * maxHorizontalAirSpeed;
+                velocity = new Vector3(velHor.x, attackEndJumpSpeed, velHor.y);
+                ChangeState(PlayerState.jump);
+            }
         }
     }
 
@@ -550,6 +585,12 @@ public class PlayerController : CanReceiveMessageFromAnimation
     {
         velocity += Vector3.down * gravity * Time.deltaTime;
 
+        if (parrySuccessful)
+        {
+            // can't fall during parry state if your parry succeeds
+            velocity = new Vector3(velocity.x, Mathf.Max(velocity.y, 0), velocity.z);
+        }
+
         if (GetGrounded())
         {
             velocity = new Vector3(0, velocity.y, 0);
@@ -564,6 +605,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
         {
             // endlag of parry, vulnerable
             invuln = false;
+            parryPose.SetTint(vulnerableTint);
         }
         else
         {
@@ -579,10 +621,13 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     public float groundedTimeAfterParryHit = 0.5f;
     public float groundedTimeAfterAttackHit = 0.5f;
-    private bool GetGrounded()
+    public bool GetGrounded()
     {
         bool grounded = controller.isGrounded || timeSinceSuccessfulAttack <= groundedTimeAfterAttackHit || timeSinceSuccessfulParry <= groundedTimeAfterParryHit;
-        if (grounded) usedPunchThisAirborne = false;
+
+        if (controller.isGrounded || timeSinceSuccessfulParry <= groundedTimeAfterParryHit)
+            usedPunchThisAirborne = false;
+
         return grounded;
     }
 
@@ -598,10 +643,13 @@ public class PlayerController : CanReceiveMessageFromAnimation
         if (currState == PlayerState.parry && timer <= parryActiveTime)
         {
             // successful parry!
+            timeSinceSuccessfulParry = 0;
             GlobalObjects.timeControllerStatic.TempChangeTimescale(0.05f, 0f, 0.3f, 0f);
             generalSoundPlayer.PlayOneShot(parryHitSound);
             beenHit = false;
             enemy.Parried();
+            helperSprites.ShowFistIcon();
+            parrySuccessful = true;
         }
 
         if (currState == PlayerState.dodge && invuln)
@@ -623,17 +671,26 @@ public class PlayerController : CanReceiveMessageFromAnimation
         Vector2 hor = new Vector2(rawLaunchVector.x, rawLaunchVector.z).normalized * horizontalLaunchSpeed;
         Vector3 launchVector = new Vector3(hor.x, verticalLaunchSpeed, hor.y);
 
-        // disable character controller
-        controller.detectCollisions = false;
-        controller.enabled = false;
-        
         // enable rigidbody and launch it
-        plummeter.gameObject.SetActive(true);
-        plummeter.transform.position = transform.position;
+        EnablePlummeterAndDisableController(false);
         plummeter.AddForce(launchVector, ForceMode.VelocityChange);
 
         // change to plummet state so the player actually follows the rigidbody
         ChangeState(PlayerState.plummet);
+    }
+
+    private void EnablePlummeterAndDisableController(bool inheretControllerVelocity)
+    {
+        controller.detectCollisions = false;
+        controller.enabled = false;
+
+        plummeter.transform.position = transform.position;
+        plummeter.gameObject.SetActive(true);
+
+        if (inheretControllerVelocity)
+        {
+            plummeter.AddForce(velocity, ForceMode.VelocityChange);
+        }
     }
 
     private void MaybeFadeOutChargeSound()
@@ -681,5 +738,6 @@ public class PlayerController : CanReceiveMessageFromAnimation
     {
         //generalSoundPlayer.PlayOneShot(dashPunchHitSound, 0.5f);
         GlobalObjects.timeControllerStatic.TempChangeTimescale(0.05f, 0f, 0.3f, 0f);
+        timeSinceSuccessfulAttack = 0;
     }
 }

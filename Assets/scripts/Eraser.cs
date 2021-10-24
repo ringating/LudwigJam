@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class Eraser : MonoBehaviour
 {
+    public Victory victoryScript;
     public Transform[] eraserLocations;
     public float distanceToTriggerRunAway;
+    public float distanceToTriggerFinalGoal;
     public float moveSpeed;
 
-    private int currLocationIndex = 0;
+    private PlayerController player;
+
+    private int currLocationIndex;
     private float moveTime;
 
     private float timer;
@@ -16,17 +20,41 @@ public class Eraser : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        transform.position = eraserLocations[0].position;
+        currLocationIndex = 0;
+        transform.position = eraserLocations[currLocationIndex].position;
+        player = GlobalObjects.playerStatic;
     }
 
     // Update is called once per frame
     void Update()
     {
+        // speen
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y + (Time.deltaTime * 180f), transform.localEulerAngles.z);
-        
-        if (Vector3.Distance(GlobalObjects.playerStatic.transform.position, transform.position) > distanceToTriggerRunAway)
-        {
 
+
+
+        // everything else
+
+        Vector3 toTarget = eraserLocations[currLocationIndex].position - transform.position;
+        Vector3 toPlayer = player.transform.position - transform.position;
+
+        MoveTowardsTargetPos(toTarget);
+
+        if (currLocationIndex == eraserLocations.Length - 1)
+        {
+            if (toTarget.magnitude < 0.1f && toPlayer.magnitude < distanceToTriggerFinalGoal)
+            {
+                victoryScript.StartVictorySequence();
+            }
         }
+        else if(toTarget.magnitude < 0.1f && toPlayer.magnitude < distanceToTriggerRunAway)
+        {
+            currLocationIndex++;
+        }
+    }
+
+    private void MoveTowardsTargetPos(Vector3 toTarget)
+    {
+        transform.position += Tools.MinAbsMagnitude(toTarget.normalized * moveSpeed * Time.deltaTime, toTarget);
     }
 }
