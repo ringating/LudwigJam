@@ -104,13 +104,16 @@ public class PaperEnemy : Hazard
             setLookDir(velocity);
         }
 
-        if (currState != EnemyState.attackStartup)
-        {
-            controller.Move(velocity * Time.deltaTime);
-        }
-        else
-        {
-            SetControllerPos(currPullBackPos);
+        if(currState != EnemyState.dead)
+        { 
+            if (currState != EnemyState.attackStartup)
+            {
+                controller.Move(velocity * Time.deltaTime);
+            }
+            else
+            {
+                SetControllerPos(currPullBackPos);
+            }
         }
 
         if (currState != EnemyState.forceReturnHome && Vector3.Distance(transform.position, homePos) > maxDistanceFromHome)
@@ -168,6 +171,7 @@ public class PaperEnemy : Hazard
                 deadSprite1.forceHideAndDisable();
                 deadSprite2.forceHideAndDisable();
                 enemySprites.enabled = true;
+                controller.enabled = true;
                 break;
 
             case EnemyState.forceReturnHome:
@@ -215,6 +219,7 @@ public class PaperEnemy : Hazard
                 deadSprite1.enabled = true;
                 deadSprite2.enabled = true;
                 audioPlayer.PlayOneShot(deathSound);
+                controller.enabled = false;
                 break;
 
             case EnemyState.forceReturnHome:
@@ -290,6 +295,9 @@ public class PaperEnemy : Hazard
     private void DeadUpdate()
     {
         velocity = (homePos - transform.position).normalized * respawnDriftSpeed;
+
+        // dead state disables the controller so we can pass through walls, so move using the transform directly
+        transform.position += velocity * Time.deltaTime;
 
         if (timer < respawnTime)
         {

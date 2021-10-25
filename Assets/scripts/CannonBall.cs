@@ -7,9 +7,9 @@ public class CannonBall : Hazard
     public float parryDeactivateTime = 1.5f;
     public float attackRadius = 1.5f;
     
-    [HideInInspector]
+    //[HideInInspector]
     public Vector3 velocity;
-    [HideInInspector]
+    //[HideInInspector]
     public float lifeTime;
     public SpriteTurnSegments visuals;
 

@@ -12,6 +12,8 @@ public class SpikeCollider : MonoBehaviour
 	public float optimizationRadius = 3f;
 	public float cooldown = 1f;
 
+	public AudioClip stabSound;
+
 	private PlayerController player;
 	private float cooldownTimer;
 
@@ -37,6 +39,8 @@ public class SpikeCollider : MonoBehaviour
 						player.KnockedOut(posToFlyAwayFrom, horizontalLaunchSpeed, verticalLaunchSpeed);
 
 						cooldownTimer = 0;
+
+						player.generalSoundPlayer.PlayOneShot(stabSound);
 
 						return;
 					}

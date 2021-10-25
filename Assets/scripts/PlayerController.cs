@@ -606,6 +606,16 @@ public class PlayerController : CanReceiveMessageFromAnimation
             // endlag of parry, vulnerable
             invuln = false;
             parryPose.SetTint(vulnerableTint);
+
+            // nerf to parry-cancelled attacks: restricted to maxHorizontalAirSpeed once in parry recovery (even the vertical component)
+            velocity = new Vector3(velocity.x, Mathf.Min(velocity.y, maxHorizontalAirSpeed), velocity.z);
+            Vector2 horizontalVel = new Vector2(velocity.x, velocity.z);
+            if (horizontalVel.magnitude > maxHorizontalAirSpeed)
+            {
+                horizontalVel = horizontalVel.normalized * maxHorizontalAirSpeed;
+                velocity = new Vector3(horizontalVel.x, velocity.y, horizontalVel.y);
+            }
+            
         }
         else
         {
