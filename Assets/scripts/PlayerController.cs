@@ -104,9 +104,14 @@ public class PlayerController : CanReceiveMessageFromAnimation
     private bool invuln = false;
     private float timeSinceMercyRuleActivated = 0f;
     private bool parrySuccessful = false;
+    private Vector3 prevDashVelocity;
+    private float timeSinceDashEnded;
+    private const float parryDashLeniencyTime = 0.3f;
 
     void Start()
     {
+        timeSinceDashEnded = parryDashLeniencyTime + 1f;
+
         terrainMask = ~LayerMask.NameToLayer("terrain");
 
         prevPosition = transform.position;
@@ -144,10 +149,11 @@ public class PlayerController : CanReceiveMessageFromAnimation
             controller.Move(velocity * Time.deltaTime);
         }
 
-        timeSinceSuccessfulAttack += Time.unscaledDeltaTime;
-        timeSinceSuccessfulParry += Time.unscaledDeltaTime;
-        timeSinceHitByEnemy += Time.unscaledDeltaTime;
-        timeSinceMercyRuleActivated += Time.unscaledDeltaTime;
+        timeSinceSuccessfulAttack += Time.deltaTime;    // these used to use unscaledDeltaTime for  some reason
+        timeSinceSuccessfulParry += Time.deltaTime;     //
+        timeSinceHitByEnemy += Time.deltaTime;          //
+        timeSinceMercyRuleActivated += Time.deltaTime;  // (just noting in case changing them to deltaTime breaks something)
+        timeSinceDashEnded += Time.deltaTime;
     }
 
 
@@ -251,14 +257,14 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     crosshairSprite.enabled = true;
                     timer = 0;
                     timer2 = 0;
-                    chargeSoundPlayer.volume = 1f;
+                    chargeSoundPlayer.volume = 0.7f; // change chargeSoundPlayer volume here
                     chargeSoundPlayer.Play();
                     break;
 
                 case PlayerState.attack:
                     attackPose.enabled = true;
                     timer = 0;
-                    generalSoundPlayer.PlayOneShot(dashPunchSound, 0.5f);
+                    generalSoundPlayer.PlayOneShot(dashPunchSound, 1f);
                     usedPunchThisAirborne = true;
                     break;
 
@@ -291,10 +297,27 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 break;
 
             case PlayerState.jump:
+                bool leniencyParryHappened = false;
                 if (!controller.isGrounded)
                 {
                     velocity = GetDesiredAirVelocity();
-                    if (velocity.y <= 0) ChangeState(PlayerState.fall);
+                    if (velocity.y <= 0)
+                    {
+                        ChangeState(PlayerState.fall);
+                    }
+                    else
+                    {
+                        // still rising
+                        if (timeSinceDashEnded < parryDashLeniencyTime)
+                        {
+                            leniencyParryHappened = ParryMaybe();
+                            if (leniencyParryHappened) 
+                            {
+                                //print("lenient parry dash!");
+                                velocity = prevDashVelocity;
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -302,7 +325,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 }
                 setPlayerLookDir(getDesiredVelocity(1f));
                 ChargeZoomMaybe();
-                ParryMaybe();
+                if (!leniencyParryHappened) ParryMaybe();
                 break;
 
             case PlayerState.fall:
@@ -559,6 +582,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
             if (timer < chargeDistance)
             {
                 velocity = chargeDirection * attackSpeed;
+                prevDashVelocity = velocity;
+                timeSinceDashEnded = 0;
             }
             else
             {

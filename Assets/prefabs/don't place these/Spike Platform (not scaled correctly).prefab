@@ -991,7 +991,7 @@ GameObject:
   - component: {fileID: 21673434471389016}
   - component: {fileID: 21673434471389017}
   m_Layer: 3
-  m_Name: Spike Platform
+  m_Name: Spike Platform (not scaled correctly)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

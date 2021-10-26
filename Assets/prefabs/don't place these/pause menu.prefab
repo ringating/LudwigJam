@@ -1487,7 +1487,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3855451398838245445}
   - component: {fileID: 3855451398838245447}
-  - component: {fileID: 3855451398838245444}
+  - component: {fileID: 3855451398094300003}
   m_Layer: 5
   m_Name: music slider
   m_TagString: Untagged
@@ -1581,7 +1581,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &3855451398838245444
+--- !u!114 &3855451398094300003
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1590,7 +1590,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3855451398838245442}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 548e5491bbbdc4246b1fb6fb5c9a1989, type: 3}
+  m_Script: {fileID: 11500000, guid: 76835f49d7544dd4ebc74708e8efb450, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &3855451399057515696
