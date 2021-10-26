@@ -27,7 +27,7 @@ public class PlummetBehaviors : MonoBehaviour
 	{
         Vector2 hor = new Vector2(rb.velocity.x, rb.velocity.z);
         splat = Mathf.Abs(rb.velocity.y) < verticalSpeedThresholdToStop && hor.magnitude < horizontalSpeedThresholdToStop;
-        print(Mathf.Abs(rb.velocity.y));
+        //print(Mathf.Abs(rb.velocity.y));
 	}
 
 	private void OnCollisionEnter(Collision collision)

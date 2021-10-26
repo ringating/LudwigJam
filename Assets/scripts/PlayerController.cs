@@ -633,7 +633,9 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
         if (GetGrounded())
         {
-            velocity = new Vector3(0, velocity.y, 0);
+            velocity = Vector3.zero;
+
+            //velocity = new Vector3(0, velocity.y, 0);
             //print("goodbye horizontal velocity!");
         }
 
