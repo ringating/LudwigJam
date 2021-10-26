@@ -2754,7 +2754,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   verticalLaunchSpeed: 20
-  horizontalLaunchSpeed: 0
+  horizontalLaunchSpeed: 3
   cooldown: 1
   stabSound: {fileID: 8300000, guid: de1f39be81acf3246a47e4e43a172045, type: 3}
 --- !u!1 &8110642621502230261

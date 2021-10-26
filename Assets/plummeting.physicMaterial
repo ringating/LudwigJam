@@ -9,6 +9,6 @@ PhysicMaterial:
   m_Name: plummeting
   dynamicFriction: 0.075
   staticFriction: 0.075
-  bounciness: 0.7
+  bounciness: 0.6
   frictionCombine: 1
   bounceCombine: 3

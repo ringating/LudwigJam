@@ -6,6 +6,8 @@ public class Eraser : MonoBehaviour
 {
     public Victory victoryScript;
     public Transform[] eraserLocations;
+    public Transform failSafeLocation;
+    public float failSafeRadius;
     public float distanceToTriggerRunAway;
     public float distanceToTriggerFinalGoal;
     public float moveSpeed;
@@ -37,6 +39,7 @@ public class Eraser : MonoBehaviour
 
         Vector3 toTarget = eraserLocations[currLocationIndex].position - transform.position;
         Vector3 toPlayer = player.transform.position - transform.position;
+        Vector3 playerToFailSafe = failSafeLocation.position - player.transform.position;
 
         MoveTowardsTargetPos(toTarget);
 
@@ -51,10 +54,33 @@ public class Eraser : MonoBehaviour
         {
             currLocationIndex++;
         }
+
+        if (playerToFailSafe.magnitude < failSafeRadius)
+        {
+            // teleport eraser to end position
+
+            currLocationIndex = eraserLocations.Length - 1;
+            transform.position = eraserLocations[currLocationIndex].position;
+        }
     }
 
     private void MoveTowardsTargetPos(Vector3 toTarget)
     {
         transform.position += Tools.MinAbsMagnitude(toTarget.normalized * moveSpeed * Time.deltaTime, toTarget);
+    }
+
+	private void OnDrawGizmos()
+	{
+        Gizmos.color = Color.green;
+        for (int i  = 0; i < eraserLocations.Length-1; ++i)
+        {
+            Gizmos.DrawWireSphere(eraserLocations[i].position, distanceToTriggerRunAway);
+        }
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(eraserLocations[eraserLocations.Length - 1].position, distanceToTriggerFinalGoal);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(failSafeLocation.position, failSafeRadius);
     }
 }

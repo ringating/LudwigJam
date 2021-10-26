@@ -80,7 +80,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public SpriteTurnSegments crosshairSprite;
     public ShowHelperSprites helperSprites;
 
-    private Vector3 velocity;
+    [HideInInspector]
+    public Vector3 velocity;
     private Vector3 prevPosition;
     private PlayerState prevState;
     [HideInInspector]
@@ -198,6 +199,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 case PlayerState.attack:
                     attackPose.forceHideAndDisable();
                     usedPunchThisAirborne = true;
+                    timeSinceSuccessfulParry = groundedTimeAfterParryHit + 1;
                     break;
 
                 case PlayerState.plummet:
@@ -315,6 +317,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                             {
                                 //print("lenient parry dash!");
                                 velocity = prevDashVelocity;
+                                timeSinceDashEnded = parryDashLeniencyTime + 1f;
                             }
                         }
                     }
@@ -477,6 +480,11 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 timeSinceSuccessfulAttack = groundedTimeAfterAttackHit + 1;
             }
 
+            /*if (timeSinceSuccessfulParry < groundedTimeAfterParryHit) // lmao this too
+            {
+                timeSinceSuccessfulParry = groundedTimeAfterParryHit + 1;
+            }*/
+
             velocity = new Vector3(velocity.x, jumpSpeed, velocity.z);
             ChangeState(PlayerState.jump);
             generalSoundPlayer.PlayOneShot(jumpSound, 1f);
@@ -599,6 +607,13 @@ public class PlayerController : CanReceiveMessageFromAnimation
     {
         if (Input.GetButtonDown("Parry") && !GlobalObjects.pauseMenuStatic.paused)
         {
+            if (timeSinceSuccessfulParry < groundedTimeAfterParryHit) // see "lmao this too"
+            {
+                timeSinceSuccessfulParry = groundedTimeAfterParryHit + 1;
+            }
+
+            //parrySuccessful = false;
+
             ChangeState(PlayerState.parry);
             return true;
         }
@@ -619,6 +634,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
         if (GetGrounded())
         {
             velocity = new Vector3(0, velocity.y, 0);
+            //print("goodbye horizontal velocity!");
         }
 
         if (timer < parryActiveTime)

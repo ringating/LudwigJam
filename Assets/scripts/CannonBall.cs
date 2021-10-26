@@ -78,4 +78,10 @@ public class CannonBall : Hazard
             GlobalObjects.playerStatic.OnEnemyAttackHit(this);
         }
     }
+
+	private void OnDrawGizmos()
+	{
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRadius);
+	}
 }

@@ -141,6 +141,9 @@ public class PaperEnemy : Hazard
             Gizmos.DrawLine(transform.position, transform.position + velocity);
             print(velocity);
         }
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, aggroRange);
     }
 
     private void ChangeState(EnemyState newState)
