@@ -6,6 +6,7 @@ TagManager:
   tags:
   - spike
   - cannonball
+  - PlayerRigidBody
   layers:
   - Default
   - TransparentFX

@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class MercyRuleDisplay : MonoBehaviour
 {
-    public Image mercy1;
-    public Image mercy2;
-    public Image mercy3;
+    public Text mercy1;
+    public Text mercy2;
+    public Text mercy3;
 
     private PlayerController player;
 

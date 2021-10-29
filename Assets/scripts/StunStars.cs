@@ -49,23 +49,23 @@ public class StunStars : MonoBehaviour
 
     private void SetVisibleBasedOnHitstunEscapeTimer()
     {
-        float remainingStun = 1f; // TODO
+        float remainingStun = player.recoveryRemaining;
 
         if (player.currState == PlayerController.PlayerState.plummet)
         {
-            if (remainingStun >= 1f)
+            if (remainingStun > 2f / 3f)
             {
                 star1.enabled = true;
                 star2.enabled = true;
                 star3.enabled = true;
             }
-            else if (remainingStun > 2f / 3f)
+            else if (remainingStun > 1f / 3f)
             {
                 if (star1.visible) star1.forceHideAndDisable();
                 star2.enabled = true;
                 star3.enabled = true;
             }
-            else if (remainingStun > 1f / 3f)
+            else
             {
                 if (star1.visible) star1.forceHideAndDisable();
                 if (star2.visible) star2.forceHideAndDisable();

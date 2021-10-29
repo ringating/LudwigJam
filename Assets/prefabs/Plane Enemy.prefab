@@ -1239,7 +1239,8 @@ MonoBehaviour:
   attackSphereRadius: 2
   hazardousRadius: 1.5
   playerAttackSphereRadius: 2
-  minInRangeTimeBeforeAttack: 0.1
+  minInRangeTimeBeforeAttack: 1
+  minTimeBeforeAttackHard: 0.1
   maxInRangeTimeBeforeAttack: 3
   aggroTargetHeight: 4
   aggroTargetStopDistance: 4
@@ -1254,6 +1255,7 @@ MonoBehaviour:
   patrolRadius: 5
   aggroRange: 12
   patrolSpeedScalar: 1
+  playerYToForceDeAggro: 12
 --- !u!82 &9041702358715450589
 AudioSource:
   m_ObjectHideFlags: 0

@@ -72,7 +72,7 @@ public class Victory : MonoBehaviour
 
 			finalTime = Time.unscaledTime;
 
-			timeString = GetTimeString();
+			timeString = GetTimeString(finalTime, true);
 
 			// enable black screen
 			blackness.gameObject.SetActive(true);
@@ -90,9 +90,9 @@ public class Victory : MonoBehaviour
 		}
     }
 
-	private string GetTimeString()
+	public string GetTimeString(float currTime, bool includeMs)
 	{
-		float totalSeconds = finalTime - startTime;
+		float totalSeconds = currTime - startTime;
 
 		int hours = (int) (totalSeconds / (60f * 60f));
 		//print("total seconds: " + totalSeconds + ", hours: " + hours);
@@ -100,7 +100,9 @@ public class Victory : MonoBehaviour
 		int seconds = (int) ( totalSeconds - ((hours * 60f * 60f) + (minutes * 60)) );
 		int ms = (int) (1000f * ( totalSeconds - ( (hours * 60f * 60f) + (minutes * 60) + seconds )));
 
-		return hours + ":" + minutes + ":" + seconds + "." + ms;
+		//return hours + ":" + minutes + ":" + seconds + "." + ms;
+
+		return FormatHours(hours) + FormatMinutes(hours, minutes) + FormatSeconds(hours, minutes, seconds) + (includeMs ? FormatMilliseconds(ms) : "");
 	}
 
 	private void FadeInCanvasElements(float dt)
@@ -130,5 +132,84 @@ public class Victory : MonoBehaviour
 		musicSource.volume = endMusicVolume; // reset the music volume
 		musicSource.Play(); // restart the music
 		SceneManager.LoadScene(0);
+	}
+
+	private string FormatHours(int hours)
+	{
+		if (hours > 0)
+		{
+			return hours + ":";
+		}
+		else
+		{
+			return "";
+		}
+	}
+
+	private string FormatMinutes(int hours, int minutes)
+	{
+		if (minutes > 0)
+		{
+			if (hours > 0 && minutes < 10)
+			{
+				return "0" + minutes + ":";
+			}
+			else
+			{
+				return minutes + ":";
+			}
+		}
+		else
+		{
+			if (hours > 0)
+			{
+				return "00:";
+			}
+			else
+			{
+				return "";
+			}
+		}
+	}
+
+	private string FormatSeconds(int hours, int minutes, int seconds)
+	{
+		if (seconds > 0)
+		{
+			if ((hours > 0 || minutes > 0) && seconds < 10)
+			{
+				return "0" + seconds + "";
+			}
+			else
+			{
+				return seconds + "";
+			}
+		}
+		else
+		{
+			if (hours > 0 || minutes > 0)
+			{
+				return "00";
+			}
+			else
+			{
+				return "0";
+			}
+		}
+	}
+
+	private string FormatMilliseconds(float ms)
+	{
+		if (ms < 10)
+		{
+			return ".00" + ms;
+		}
+
+		if (ms < 100)
+		{
+			return ".0" + ms;
+		}
+
+		return "." + ms;
 	}
 }

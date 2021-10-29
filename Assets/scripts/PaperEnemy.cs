@@ -18,7 +18,7 @@ public class PaperEnemy : Hazard
 
     public CharacterController controller;
 
-    public float maxDistanceFromHome = 30f;
+    //public float maxDistanceFromHome = 30f;
     public float minReturnHomeTime = 4f;
     public Color parriedTint;
     public float generalSpeed = 15f;
@@ -30,7 +30,8 @@ public class PaperEnemy : Hazard
     public float attackSphereRadius = 2f;
     public float hazardousRadius = 1f;
     public float playerAttackSphereRadius = 2f;
-    public float minInRangeTimeBeforeAttack = 0f; // how long the enemy will sit still before attacking
+    public float minInRangeTimeBeforeAttack = 1f; // how long the enemy will sit still before attacking
+    public float minTimeBeforeAttackHard = 0.1f;
     public float maxInRangeTimeBeforeAttack = 5f; //
     public float aggroTargetHeight;       // plane tries to fly here when aggro, 
     public float aggroTargetStopDistance; // and will stop flying if it gets at least this close,
@@ -45,6 +46,7 @@ public class PaperEnemy : Hazard
     public float patrolRadius;
     public float aggroRange;
     public float patrolSpeedScalar = 1f;
+    //public float playerYToForceDeAggro = 5f;
 
 
     // MUST BE TRUE: aggroRange > attackTimerStartDistance > (aggroTargetStopDistance + aggroRandomOffsetMaxDistance)
@@ -117,10 +119,20 @@ public class PaperEnemy : Hazard
             }
         }
 
-        if (currState != EnemyState.forceReturnHome && Vector3.Distance(transform.position, homePos) > maxDistanceFromHome)
+        /*if (
+            currState != EnemyState.forceReturnHome && 
+            currState != EnemyState.dead && 
+            currState != EnemyState.stunned &&
+            currState != EnemyState.patrolling &&
+            (
+                Vector3.Distance(transform.position, homePos) > maxDistanceFromHome || 
+                (!StaticValues.hardMode && player.transform.position.y > homePos.y + playerYToForceDeAggro)
+            )
+        )
         {
             ChangeState(EnemyState.forceReturnHome);
-        }
+        }*/
+        
 	}
 
     private void SetControllerPos(Vector3 targetPos)
@@ -145,6 +157,11 @@ public class PaperEnemy : Hazard
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, aggroRange);
+
+        /*Gizmos.color = Color.blue;
+        Vector3 pos = transform.position + (Vector3.up * playerYToForceDeAggro);
+        Gizmos.DrawLine(pos + Vector3.forward, pos + Vector3.back);
+        Gizmos.DrawLine(pos + Vector3.left, pos + Vector3.right);*/
     }
 
     private void ChangeState(EnemyState newState)
@@ -318,7 +335,8 @@ public class PaperEnemy : Hazard
         Vector3 diff = GetPatrolPositionForTime(Time.time) - transform.position;
         velocity = Vector3.ClampMagnitude(diff, generalSpeed * 100);
 
-        if (Vector3.Distance(transform.position, player.transform.position) < aggroRange)
+        //if (Vector3.Distance(transform.position, GetVec3ToPlayer()) < aggroRange)
+        if (GetVec3ToPlayer().magnitude < aggroRange)
         {
             ChangeState(EnemyState.aggro);
         }
@@ -336,7 +354,8 @@ public class PaperEnemy : Hazard
 
     private void AggroUpdate()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        //float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        float distanceToPlayer = GetVec3ToPlayer().magnitude;
 
         if (distanceToPlayer > aggroRange + 0.5f) // a little extra distance to prevent vibrating in/out of aggro
         {
@@ -434,7 +453,11 @@ public class PaperEnemy : Hazard
 
 	private float GetNewAttackWaitTime()
     {
-        return Random.Range(minInRangeTimeBeforeAttack, maxInRangeTimeBeforeAttack);
+        return Random.Range
+        (
+            StaticValues.hardMode ? minTimeBeforeAttackHard : minInRangeTimeBeforeAttack, 
+            maxInRangeTimeBeforeAttack
+        );
     }
 
 	private Vector3 GetNewWaitPosOffset()
@@ -488,5 +511,10 @@ public class PaperEnemy : Hazard
         {
             player.OnEnemyAttackHit(this);
         }
+    }
+
+    private Vector3 GetVec3ToPlayer()
+    {
+        return player.transform.position - (StaticValues.hardMode ? transform.position : homePos);
     }
 }

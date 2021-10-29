@@ -33,9 +33,24 @@ public class SpikeCollider : MonoBehaviour
 			Vector2 temp = Random.insideUnitCircle.normalized;
 			Vector3 posToFlyAwayFrom = player.transform.position + new Vector3(temp.x, -1, temp.y);
 
+			player.startAirRecoveryTimer(float.MaxValue);
+
 			player.KnockedOut(posToFlyAwayFrom, horizontalLaunchSpeed, verticalLaunchSpeed);
 
-			player.generalSoundPlayer.PlayOneShot(stabSound);
+			PlayStabSound();
+		}
+	}
+
+	public void PlayStabSound()
+	{
+		player.generalSoundPlayer.PlayOneShot(stabSound);
+	}
+
+	private void OnCollisionEnter(Collision collision)
+	{
+		if (collision.collider.gameObject.tag == "PlayerRigidBody")
+		{
+			PlayStabSound();
 		}
 	}
 }

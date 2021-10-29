@@ -109,18 +109,38 @@ public class PlayerController : CanReceiveMessageFromAnimation
     private float timeSinceDashEnded;
     private const float parryDashLeniencyTime = 0.3f;
 
+    public float plummetStartY { private set; get; }
+
 
     public void startAirRecoveryTimer(float timerDuration)
     {
+        if (StaticValues.hardMode) timerDuration = float.MaxValue;
+
         airRecoveryTimer = timerDuration;
         airRecoveryTime = timerDuration;
     }
     private float airRecoveryTimer = 0;
     private float airRecoveryTime = 3f;
+    public float recoveryRemaining
+    {
+        get
+        {
+            return Mathf.Max(0f, airRecoveryTimer / airRecoveryTime);
+        }
+    }
+    public float airRecoveryTimeInEasyMode = 3f;
+    public float airRecoveryHeight = 10f; // air recovery can only occur if the player is lower than this height from where they were launched
 
     void Start()
     {
+        if (!StaticValues.hardMode)
+        {
+            fallSpeedToPlummet = float.MaxValue;
+        }
+
         timeSinceDashEnded = parryDashLeniencyTime + 1f;
+
+        timeSinceMercyRuleActivated = mercyRuleInvulnDuration + 1f;
 
         terrainMask = ~LayerMask.NameToLayer("terrain");
 
@@ -251,7 +271,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
                 case PlayerState.plummet:
                     plummetPose.enabled = true;
                     timer = 0;
-                    timer2 = 0;
+                    if (prevState != PlayerState.plummet) timer2 = 0; // don't reset the mercy timer if prev state was also plummet, lol
+                    plummetStartY = transform.position.y;
                     EnablePlummeterAndDisableController(true);
                     break;
 
@@ -720,7 +741,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
             enemy.BeenHit(); // attack trades, lmao
             if ( !(enemy.gameObject.tag == "cannonball") && !StaticValues.hardMode)
             {
-                beenHit = false; // unless not playing hard mode
+                beenHit = false; // ...unless not playing hard mode
             }
         }
 
@@ -746,21 +767,26 @@ public class PlayerController : CanReceiveMessageFromAnimation
             KnockedOut(enemy.transform.position, 10f, 20f);
             timeSinceHitByEnemy = 0f;
             generalSoundPlayer.PlayOneShot(getHitSound);
+
+            startAirRecoveryTimer(airRecoveryTimeInEasyMode);
         }
     }
 
     public void KnockedOut(Vector3 positionToFlyAwayFrom, float horizontalLaunchSpeed, float verticalLaunchSpeed)
     {
-        Vector3 rawLaunchVector = (transform.position - positionToFlyAwayFrom);
-        Vector2 hor = new Vector2(rawLaunchVector.x, rawLaunchVector.z).normalized * horizontalLaunchSpeed;
-        Vector3 launchVector = new Vector3(hor.x, verticalLaunchSpeed, hor.y);
+        if (timeSinceMercyRuleActivated > mercyRuleInvulnDuration) // if mercy rule not active
+        {
+            Vector3 rawLaunchVector = (transform.position - positionToFlyAwayFrom);
+            Vector2 hor = new Vector2(rawLaunchVector.x, rawLaunchVector.z).normalized * horizontalLaunchSpeed;
+            Vector3 launchVector = new Vector3(hor.x, verticalLaunchSpeed, hor.y);
 
-        // enable rigidbody and launch it
-        EnablePlummeterAndDisableController(false);
-        plummeter.AddForce(launchVector, ForceMode.VelocityChange);
+            // enable rigidbody and launch it
+            EnablePlummeterAndDisableController(false);
+            plummeter.AddForce(launchVector, ForceMode.VelocityChange);
 
-        // change to plummet state so the player actually follows the rigidbody
-        ChangeState(PlayerState.plummet);
+            // change to plummet state so the player actually follows the rigidbody
+            ChangeState(PlayerState.plummet);
+        }
     }
 
     private void EnablePlummeterAndDisableController(bool inheretControllerVelocity)
@@ -816,6 +842,22 @@ public class PlayerController : CanReceiveMessageFromAnimation
         }
 
         timer2 += Time.deltaTime;
+
+        AirRecoveryUpdate();
+    }
+
+    private void AirRecoveryUpdate()
+    {
+        if (transform.position.y <= plummetStartY + airRecoveryHeight)
+        {
+            airRecoveryTimer -= Time.deltaTime;
+        }
+
+        if (airRecoveryTimer <= 0)
+        {
+            ChangeState(PlayerState.fall);
+            return;
+        }
     }
 
     public void HitAnEnemy(Hazard enemy)
