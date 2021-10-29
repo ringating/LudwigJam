@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StaticValues
+public static class StaticValues
 {
 	public static bool useController;
+	public static bool hardMode;
 }

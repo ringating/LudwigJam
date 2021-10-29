@@ -1247,7 +1247,8 @@ MonoBehaviour:
   aggroRandomOffsetMaxDistance: 2
   parryStunTime: 3
   stuckStunTime: 0.5
-  respawnTime: 5
+  respawnTime: 10
+  respawnTimeHard: 5
   respawnDriftSpeed: 5
   reversePatrolDirection: 0
   patrolRadius: 5

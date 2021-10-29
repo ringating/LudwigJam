@@ -109,6 +109,15 @@ public class PlayerController : CanReceiveMessageFromAnimation
     private float timeSinceDashEnded;
     private const float parryDashLeniencyTime = 0.3f;
 
+
+    public void startAirRecoveryTimer(float timerDuration)
+    {
+        airRecoveryTimer = timerDuration;
+        airRecoveryTime = timerDuration;
+    }
+    private float airRecoveryTimer = 0;
+    private float airRecoveryTime = 3f;
+
     void Start()
     {
         timeSinceDashEnded = parryDashLeniencyTime + 1f;
@@ -252,6 +261,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     timer = 0;
                     timer2 = 0;
                     generalSoundPlayer.PlayOneShot(parrySound);
+                    velocity += Vector3.down * gravity * Time.deltaTime; // fix 1 frame of attack icon flicker
                     break;
 
                 case PlayerState.charge:
@@ -638,6 +648,23 @@ public class PlayerController : CanReceiveMessageFromAnimation
             //velocity = new Vector3(0, velocity.y, 0);
             //print("goodbye horizontal velocity!");
         }
+        
+        if (controller.isGrounded) 
+        {
+            velocity += Vector3.down * gravity * Time.deltaTime;
+        }
+
+        /*if (GetGrounded())
+        {
+            if (controller.isGrounded)
+            {
+                velocity += Vector3.down * gravity * Time.deltaTime;
+            }
+            else
+            {
+                velocity = Vector3.zero;
+            }
+        }*/
 
         if (timer < parryActiveTime)
         {
@@ -688,9 +715,13 @@ public class PlayerController : CanReceiveMessageFromAnimation
     {
         bool beenHit = timeSinceMercyRuleActivated > mercyRuleInvulnDuration; // true unless mercy rule activated
 
-        if (currState == PlayerState.attack) // attack trades, lmao
+        if (currState == PlayerState.attack) 
         {
-            enemy.BeenHit();
+            enemy.BeenHit(); // attack trades, lmao
+            if ( !(enemy.gameObject.tag == "cannonball") && !StaticValues.hardMode)
+            {
+                beenHit = false; // unless not playing hard mode
+            }
         }
 
         if (currState == PlayerState.parry && timer <= parryActiveTime)

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Victory : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class Victory : MonoBehaviour
 	public AudioSource voidSound;
 	private AudioSource musicSource;
 	public AudioSource eraserSoundSource;
+	public GameObject mainMenuButton;
 	
 
 	[HideInInspector]
@@ -20,6 +22,8 @@ public class Victory : MonoBehaviour
 	private float finalTime;
 	private float fadeSpeed = 0.2f;
 	private string timeString;
+
+	private float endMusicVolume;
 
 	private void Start()
 	{
@@ -47,6 +51,14 @@ public class Victory : MonoBehaviour
 			// fade in black screen
 			// enable time + text once black screen reaches full opacity
 			FadeInCanvasElements(Time.unscaledDeltaTime);
+
+
+			// bring up the main menu button, on an extra delay compared to the win text
+			if (Time.unscaledTime > finalTime + (1/fadeSpeed) + 2f)
+			{
+				mainMenuButton.SetActive(true);
+				Cursor.lockState = CursorLockMode.None;
+			}
 		}
 	}
 
@@ -72,6 +84,9 @@ public class Victory : MonoBehaviour
 
 			// set time text
 			time.text = timeString;
+
+			// store volume
+			endMusicVolume = musicSource.volume;
 		}
     }
 
@@ -108,5 +123,12 @@ public class Victory : MonoBehaviour
 	private void FadeInVoidSound(float dt)
 	{
 		voidSound.volume = Mathf.Min(1f, voidSound.volume + (fadeSpeed * dt));
+	}
+
+	public void GoToMainMenuScene()
+	{
+		musicSource.volume = endMusicVolume; // reset the music volume
+		musicSource.Play(); // restart the music
+		SceneManager.LoadScene(0);
 	}
 }

@@ -5,17 +5,20 @@ using UnityEngine.UI;
 
 public class MusicSlider : MonoBehaviour
 {
-	private Slider slider;
+	public Slider slider;
 	private float prevValue;
 	private float prevVolume;
 	private AudioSource musicPlayer;
 
 	private void Start()
 	{
-		slider = GetComponent<Slider>();
+		//slider = GetComponent<Slider>();
 		slider.value = SettingsStatic.musicVolume; // start by inheriting value from the static settings class
 
-		musicPlayer = FindObjectsOfType<MusicObject>()[0].musicSource;
+		if (!musicPlayer)
+		{
+			musicPlayer = FindObjectsOfType<MusicObject>()[0].musicSource;
+		}
 
 		SetVolume();
 	}
@@ -51,5 +54,14 @@ public class MusicSlider : MonoBehaviour
 	public float GetSliderValue()
 	{
 		return slider.value;
+	}
+
+	private void OnEnable()
+	{
+		if (!musicPlayer)
+		{
+			musicPlayer = FindObjectsOfType<MusicObject>()[0].musicSource;
+		}
+		SetSlider();
 	}
 }

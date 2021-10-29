@@ -83,7 +83,12 @@ public class ShowHelperSprites : MonoBehaviour
 
         // crosshair
 
-        bool crosshairOn = !player.usedPunchThisAirborne && !player.controller.isGrounded && player.currState != PlayerController.PlayerState.charge && player.currState != PlayerController.PlayerState.plummet && player.currState != PlayerController.PlayerState.dodge;
+        bool crosshairOn = 
+            !player.usedPunchThisAirborne && 
+            !player.controller.isGrounded && 
+            player.currState != PlayerController.PlayerState.charge && 
+            player.currState != PlayerController.PlayerState.plummet && 
+            player.currState != PlayerController.PlayerState.dodge;
 
         if (crosshairWasOn && !crosshairOn)
         {

@@ -38,7 +38,8 @@ public class PaperEnemy : Hazard
     public float aggroRandomOffsetMaxDistance = 2;
     public float parryStunTime = 3f;
     public float stuckStunTime = 1f;
-    public float respawnTime = 5f;
+    public float respawnTime = 10f;
+    public float respawnTimeHard = 5f;
     public float respawnDriftSpeed = 5f;
     public bool reversePatrolDirection;
     public float patrolRadius;
@@ -302,7 +303,7 @@ public class PaperEnemy : Hazard
         // dead state disables the controller so we can pass through walls, so move using the transform directly
         transform.position += velocity * Time.deltaTime;
 
-        if (timer < respawnTime)
+        if ( timer < (StaticValues.hardMode ? respawnTimeHard : respawnTime) )
         {
             timer += Time.deltaTime;
         }

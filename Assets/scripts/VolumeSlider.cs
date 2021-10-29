@@ -5,15 +5,18 @@ using UnityEngine.UI;
 
 public class VolumeSlider : MonoBehaviour
 {
-	private Slider slider;
+	public Slider slider;
     private float prevValue;
 	private float prevVolume;
 
 	private void Start()
 	{
-		slider = GetComponent<Slider>();
-		slider.value = SettingsStatic.volume; // start by inheriting value from the static settings class
-		SetVolume();
+		//slider = GetComponent<Slider>();
+
+		slider.value = SettingsStatic.volume;			// start by inheriting value from the static settings class
+		prevValue = SettingsStatic.volume;				//
+		prevVolume = SettingsStatic.volume;				//
+		AudioListener.volume = SettingsStatic.volume;	//
 	}
 
 	private void Update()
@@ -47,5 +50,11 @@ public class VolumeSlider : MonoBehaviour
 	public float GetSliderValue()
 	{
 		return slider.value;
+	}
+
+	private void OnEnable()
+	{
+		AudioListener.volume = SettingsStatic.volume;
+		slider.value = SettingsStatic.volume;
 	}
 }
