@@ -24,6 +24,7 @@ public class Victory : MonoBehaviour
 	private string timeString;
 
 	private float endMusicVolume;
+	private const float voidVolume = 0.5f;
 
 	private void Start()
 	{
@@ -118,13 +119,13 @@ public class Victory : MonoBehaviour
 
 	private void FadeOutMusicAndEraser(float dt)
 	{
-		musicSource.volume = Mathf.Max(0f, musicSource.volume - (fadeSpeed * dt));
+		musicSource.volume = Mathf.Max(0f, musicSource.volume - (fadeSpeed * endMusicVolume * dt));
 		eraserSoundSource.volume = Mathf.Max(0f, eraserSoundSource.volume - (fadeSpeed * dt));
 	}
 
 	private void FadeInVoidSound(float dt)
 	{
-		voidSound.volume = Mathf.Min(1f, voidSound.volume + (fadeSpeed * dt));
+		voidSound.volume = Mathf.Min(voidVolume, voidSound.volume + (fadeSpeed * voidVolume * dt));
 	}
 
 	public void GoToMainMenuScene()
