@@ -133,6 +133,14 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public float airRecoveryTimeInEasyMode = 3f;
     public float airRecoveryHeight = 10f; // air recovery can only occur if the player is lower than this height from where they were launched
 
+    public float stillGetUpRemaining
+    {
+        get
+        {
+            return Mathf.Max( 0, (plummetTimeUnderSpeedToRecover-timer)/plummetTimeUnderSpeedToRecover );
+        }
+    }
+
     void Start()
     {
         if (!StaticValues.hardMode)
@@ -840,7 +848,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
             {
                 timer = 0;
                 ChangeState(PlayerState.idle);
-                generalSoundPlayer.PlayOneShot(getUpSound, 0.7f); // regular getup sound
+                //generalSoundPlayer.PlayOneShot(getUpSound, 0.7f); // regular getup sound
+                stunStars.PlayUnstun3Sound(); // replaceing the old getup sound with the unstun sound
             }
         }
         else

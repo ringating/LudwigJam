@@ -61,7 +61,7 @@ public class StunStars : MonoBehaviour
 
     private void SetVisibleBasedOnHitstunEscapeTimer()
     {
-        float remainingStun = player.recoveryRemaining;
+        float remainingStun = Mathf.Min(player.recoveryRemaining, player.stillGetUpRemaining);
 
         if (player.currState == PlayerController.PlayerState.plummet)
         {
