@@ -292,7 +292,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parryDeactivateTime: 1.5
-  attackRadius: 1.5
+  attackRadius: 1
+  parryRadius: 1.5
   velocity: {x: 0, y: 0, z: 0}
   lifeTime: 0
   visuals: {fileID: 257038178139888270}
@@ -312,6 +313,7 @@ MonoBehaviour:
   segments:
   - {fileID: 257038178139888268}
   reverseLeftAndRight: 0
+  faceCameraVertically: 1
 --- !u!114 &257038178139888268
 MonoBehaviour:
   m_ObjectHideFlags: 0

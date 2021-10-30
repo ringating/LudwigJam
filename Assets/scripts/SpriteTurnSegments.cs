@@ -9,6 +9,7 @@ public class SpriteTurnSegments : MonoBehaviour
     // the first segment in the array is the front, the last sprite is the back. the in-betweens are mirrored for the other side of the object.
     public WobbleSprite[] segments;
     public bool reverseLeftAndRight;
+    public bool faceCameraVertically = false;
 
     private int segmentIndex;
 
@@ -76,7 +77,18 @@ public class SpriteTurnSegments : MonoBehaviour
 
     private void RotateToFaceCamera()
     {
-        segments[getActualIndex(segmentIndex)].transform.eulerAngles = new Vector3(0, 90 - GlobalObjects.cameraScriptStatic.yaw, 0);
+        if (!faceCameraVertically)
+        {
+            segments[getActualIndex(segmentIndex)].transform.eulerAngles = new Vector3(0, 90 - GlobalObjects.cameraScriptStatic.yaw, 0);
+        }
+        else
+        {
+            segments[getActualIndex(segmentIndex)].transform.eulerAngles = new Vector3(
+                GlobalObjects.cameraScriptStatic.pitch, 
+                90 - GlobalObjects.cameraScriptStatic.yaw, 
+                0
+            );
+        }
     }
 
     private int getActualIndex(int potentiallyBigIndex)

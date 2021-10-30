@@ -89,7 +89,7 @@ public class Eraser : MonoBehaviour
     private float GetPercentCompletion()
     {
         float highestY = eraserLocations[eraserLocations.Length - 1].position.y;
-        return (player.transform.position.y - lowestY) / (highestY / lowestY);
+        return (player.transform.position.y - lowestY) / (highestY - lowestY);
     }
 
     public string GetPercentCompletionString()

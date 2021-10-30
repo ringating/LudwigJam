@@ -5,7 +5,8 @@ using UnityEngine;
 public class CannonBall : Hazard
 {
     public float parryDeactivateTime = 1.5f;
-    public float attackRadius = 1.5f;
+    public float attackRadius = 1f;
+    public float parryRadius = 1.5f;
     
     //[HideInInspector]
     public Vector3 velocity;
@@ -16,10 +17,12 @@ public class CannonBall : Hazard
     private float lifeTimer = 0;
     private float timeSinceParried;
     private bool wasDeactivated = false;
+    private PlayerController player;
 
 	private void Start()
 	{
         timeSinceParried = parryDeactivateTime + 1;
+        player = GlobalObjects.playerStatic;
     }
 
 	// Update is called once per frame
@@ -73,7 +76,7 @@ public class CannonBall : Hazard
 
     private void TryToHitPlayer()
     {
-        if (Vector3.Distance(GlobalObjects.playerStatic.transform.position, transform.position) < attackRadius)
+        if (Vector3.Distance(player.transform.position, transform.position) < (player.inParryActiveWindow ? parryRadius : attackRadius))
         {
             GlobalObjects.playerStatic.OnEnemyAttackHit(this);
         }
@@ -83,5 +86,8 @@ public class CannonBall : Hazard
 	{
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRadius);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, parryRadius);
 	}
 }

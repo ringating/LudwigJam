@@ -28,6 +28,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public AudioClip jumpSound;
     public AudioClip landingSound;
     public AudioClip plummetBounceSound;
+    public AudioClip getUpSound;
 
     public Rigidbody plummeter;
 
@@ -236,6 +237,9 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     plummeter.gameObject.SetActive(false);
                     controller.enabled = true;
                     controller.detectCollisions = true;
+                    //usedPunchThisAirborne = false; // give them their dash back, only really useful in easy mode or after mercy rule
+                    GiveParryBenefits();             // actually maybe this instead
+                    generalSoundPlayer.PlayOneShot(getUpSound, 0.8f);
                     break;
 
                 default:
@@ -638,10 +642,10 @@ public class PlayerController : CanReceiveMessageFromAnimation
     {
         if (Input.GetButtonDown("Parry") && !GlobalObjects.pauseMenuStatic.paused)
         {
-            if (timeSinceSuccessfulParry < groundedTimeAfterParryHit) // see "lmao this too"
+            /*if (timeSinceSuccessfulParry < groundedTimeAfterParryHit) // see "lmao this too"
             {
                 timeSinceSuccessfulParry = groundedTimeAfterParryHit + 1;
-            }
+            }*/ // drop the player if they parry while floating (doesnt really seem necessary tbh)
 
             //parrySuccessful = false;
 
@@ -745,7 +749,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
             }
         }
 
-        if (currState == PlayerState.parry && timer <= parryActiveTime)
+        if (inParryActiveWindow)
         {
             // successful parry!
             timeSinceSuccessfulParry = 0;
@@ -770,6 +774,13 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
             startAirRecoveryTimer(airRecoveryTimeInEasyMode);
         }
+    }
+    public bool inParryActiveWindow 
+    { 
+        get 
+        { 
+            return (currState == PlayerState.parry && timer <= parryActiveTime); 
+        } 
     }
 
     public void KnockedOut(Vector3 positionToFlyAwayFrom, float horizontalLaunchSpeed, float verticalLaunchSpeed)
@@ -865,5 +876,11 @@ public class PlayerController : CanReceiveMessageFromAnimation
         //generalSoundPlayer.PlayOneShot(dashPunchHitSound, 0.5f);
         GlobalObjects.timeControllerStatic.TempChangeTimescale(0.05f, 0f, 0.3f, 0f);
         timeSinceSuccessfulAttack = 0;
+    }
+
+    public void GiveParryBenefits()
+    {
+        timeSinceSuccessfulParry = 0;
+        parrySuccessful = true;
     }
 }
