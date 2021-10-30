@@ -80,6 +80,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public SpriteTurnSegments chargeSprite; // forces over-shoulder camera, so it's literally just 1 sprite
     public SpriteTurnSegments crosshairSprite;
     public ShowHelperSprites helperSprites;
+    public StunStars stunStars;
 
     [HideInInspector]
     public Vector3 velocity;
@@ -239,7 +240,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     controller.detectCollisions = true;
                     //usedPunchThisAirborne = false; // give them their dash back, only really useful in easy mode or after mercy rule
                     GiveParryBenefits();             // actually maybe this instead
-                    generalSoundPlayer.PlayOneShot(getUpSound, 0.8f);
+                    //generalSoundPlayer.PlayOneShot(getUpSound, 0.8f); // only do this if recovering due to standstill
                     break;
 
                 default:
@@ -839,6 +840,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
             {
                 timer = 0;
                 ChangeState(PlayerState.idle);
+                generalSoundPlayer.PlayOneShot(getUpSound, 0.8f); // regular getup sound
             }
         }
         else
@@ -850,6 +852,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
         {
             timeSinceMercyRuleActivated = 0;
             ChangeState(PlayerState.idle);
+            generalSoundPlayer.PlayOneShot(getUpSound, 0.8f); // this sound is fine for now, something fancier could replace it though
         }
 
         timer2 += Time.deltaTime;
@@ -867,6 +870,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
         if (airRecoveryTimer <= 0)
         {
             ChangeState(PlayerState.fall);
+            stunStars.PlayUnstun3Sound();
             return;
         }
     }
