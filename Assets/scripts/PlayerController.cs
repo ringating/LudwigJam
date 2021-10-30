@@ -840,7 +840,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
             {
                 timer = 0;
                 ChangeState(PlayerState.idle);
-                generalSoundPlayer.PlayOneShot(getUpSound, 0.8f); // regular getup sound
+                generalSoundPlayer.PlayOneShot(getUpSound, 0.7f); // regular getup sound
             }
         }
         else
@@ -852,7 +852,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
         {
             timeSinceMercyRuleActivated = 0;
             ChangeState(PlayerState.idle);
-            generalSoundPlayer.PlayOneShot(getUpSound, 0.8f); // this sound is fine for now, something fancier could replace it though
+            generalSoundPlayer.PlayOneShot(getUpSound, 0.7f); // this sound is fine for now, something fancier could replace it though
         }
 
         timer2 += Time.deltaTime;

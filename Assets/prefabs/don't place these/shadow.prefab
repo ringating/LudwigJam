@@ -228,6 +228,7 @@ MonoBehaviour:
   castFrom: {fileID: 0}
   hoverDistance: 0.03
   maxShadowDistance: 40
+  shadow: {fileID: 8336094033415652811}
 --- !u!1 &8336094033494632510
 GameObject:
   m_ObjectHideFlags: 0

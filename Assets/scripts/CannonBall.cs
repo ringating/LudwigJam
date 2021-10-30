@@ -14,6 +14,8 @@ public class CannonBall : Hazard
     public float lifeTime;
     public SpriteTurnSegments visuals;
 
+    public AddShadow addShadowScript;
+
     private float lifeTimer = 0;
     private float timeSinceParried;
     private bool wasDeactivated = false;
@@ -90,4 +92,9 @@ public class CannonBall : Hazard
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, parryRadius);
 	}
+
+    public void InstantiateShadow()
+    {
+        addShadowScript.enabled = true;
+    }
 }

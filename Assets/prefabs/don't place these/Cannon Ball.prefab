@@ -255,6 +255,7 @@ GameObject:
   - component: {fileID: 257038178139888271}
   - component: {fileID: 257038178139888270}
   - component: {fileID: 257038178139888268}
+  - component: {fileID: 8684717550075978717}
   m_Layer: 0
   m_Name: Cannon Ball
   m_TagString: cannonball
@@ -297,6 +298,7 @@ MonoBehaviour:
   velocity: {x: 0, y: 0, z: 0}
   lifeTime: 0
   visuals: {fileID: 257038178139888270}
+  addShadowScript: {fileID: 8684717550075978717}
 --- !u!114 &257038178139888270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -330,3 +332,18 @@ MonoBehaviour:
   - {fileID: 257038177553685593}
   - {fileID: 257038177055269493}
   - {fileID: 257038176267608694}
+--- !u!114 &8684717550075978717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 257038178139888267}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bdff0a9a9ad3d34e95b7a666ecbcf91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shadowPrefab: {fileID: 8336094033415652810, guid: 3140e6b154dcee34fb86d0ee1cc78900, type: 3}
+  hoverDistance: 0.03
+  maxShadowDistance: 2
