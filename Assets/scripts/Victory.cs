@@ -8,6 +8,7 @@ public class Victory : MonoBehaviour
 {
 	public Image blackness;
 	public Text youWin;
+	public Text inHardMode;
 	public Text time;
 	public AudioSource voidSound;
 	private AudioSource musicSource;
@@ -114,6 +115,8 @@ public class Victory : MonoBehaviour
 		{
 			youWin.gameObject.SetActive(true);
 			time.gameObject.SetActive(true);
+
+			if (StaticValues.hardMode) inHardMode.gameObject.SetActive(true);
 		}
 	}
 
