@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class FadeInTextOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class FadeInGraphicOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public Text toFade;
+    public Graphic toFade;
 
     private const float fadeSpeed = 4f;
     private bool hovering = false;
