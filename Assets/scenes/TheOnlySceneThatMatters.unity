@@ -12905,7 +12905,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3255109554800783519, guid: 5aa6f62e9b786a54e85b21d19eafee4d, type: 3}
       propertyPath: shotTimingOffset
-      value: -0.25
+      value: -1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5aa6f62e9b786a54e85b21d19eafee4d, type: 3}
@@ -42245,7 +42245,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3255109554800783519, guid: 5aa6f62e9b786a54e85b21d19eafee4d, type: 3}
       propertyPath: shotTimingOffset
-      value: -1
+      value: -18.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5aa6f62e9b786a54e85b21d19eafee4d, type: 3}
@@ -43478,7 +43478,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3255109554800783519, guid: 5aa6f62e9b786a54e85b21d19eafee4d, type: 3}
       propertyPath: shotTimingOffset
-      value: -0.75
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5aa6f62e9b786a54e85b21d19eafee4d, type: 3}
@@ -49746,7 +49746,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3255109554800783519, guid: 5aa6f62e9b786a54e85b21d19eafee4d, type: 3}
       propertyPath: shotTimingOffset
-      value: -0.5
+      value: -3.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5aa6f62e9b786a54e85b21d19eafee4d, type: 3}
