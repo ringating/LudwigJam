@@ -55,7 +55,7 @@ public class PaperEnemy : Hazard
 
     // MUST BE TRUE: aggroRange > attackTimerStartDistance > (aggroTargetStopDistance + aggroRandomOffsetMaxDistance)
 
-    private enum EnemyState
+    public enum EnemyState
     {
         patrolling,     // flying along a fixed path, waiting for player to get in aggro range
         aggro,          // chasing player
@@ -68,7 +68,7 @@ public class PaperEnemy : Hazard
     }
 
     private Vector3 homePos;
-    private EnemyState currState = EnemyState.patrolling;
+    public EnemyState currState = EnemyState.patrolling;
     private float attackWaitTimer = 0;
     private float attackWaitTime;
     private Vector3 randomWaitPosOffset;
