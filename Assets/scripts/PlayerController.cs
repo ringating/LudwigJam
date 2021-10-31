@@ -756,6 +756,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
             {
                 beenHit = false; // ...unless not playing hard mode
             }
+            GlobalObjects.timeControllerStatic.TempChangeTimescale(0.05f, 0f, 0.3f, 0f); // hitstop for trades
         }
 
         if (inParryActiveWindow)

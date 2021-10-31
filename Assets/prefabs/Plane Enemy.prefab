@@ -1557,6 +1557,7 @@ MonoBehaviour:
   minInRangeTimeBeforeAttack: 1
   minTimeBeforeAttackHard: 0.1
   maxInRangeTimeBeforeAttack: 3
+  maxTimeBeforeAttackHard: 2.1
   aggroTargetHeight: 4
   aggroTargetStopDistance: 4
   attackTimerStartDistance: 8
@@ -1569,8 +1570,15 @@ MonoBehaviour:
   reversePatrolDirection: 0
   patrolRadius: 5
   aggroRange: 12
-  aggroHeight: 10
+  aggroHeightUp: 5
+  aggroHeightDown: 5
+  extraRangeToDeaggro: 5
+  extraHeightUpToDeaggro: 3
+  extraHeightDownToDeaggro: 3
+  aggroMoveSpeed: 5
   patrolSpeedScalar: 1
+  patrolCycleOffset: 0
+  currState: 0
 --- !u!82 &9041702358715450589
 AudioSource:
   m_ObjectHideFlags: 0

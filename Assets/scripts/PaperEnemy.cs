@@ -34,7 +34,8 @@ public class PaperEnemy : Hazard
     public float playerAttackSphereRadius = 2f;
     public float minInRangeTimeBeforeAttack = 1f; // how long the enemy will sit still before attacking
     public float minTimeBeforeAttackHard = 0.1f;
-    public float maxInRangeTimeBeforeAttack = 5f; //
+    public float maxInRangeTimeBeforeAttack = 5f;
+    public float maxTimeBeforeAttackHard = 3f;
     public float aggroTargetHeight;       // plane tries to fly here when aggro, 
     public float aggroTargetStopDistance; // and will stop flying if it gets at least this close,
     public float attackTimerStartDistance; // and will start flying again if the player gets this far away
@@ -47,9 +48,14 @@ public class PaperEnemy : Hazard
     public bool reversePatrolDirection;
     public float patrolRadius;
     public float aggroRange;
-    public float aggroHeight = 10f;
+    public float aggroHeightUp = 5f;
+    public float aggroHeightDown = 5f;
+    public float extraRangeToDeaggro = 5f;
+    public float extraHeightUpToDeaggro = 3f;
+    public float extraHeightDownToDeaggro = 3f;
     public float aggroMoveSpeed = 5f;
     public float patrolSpeedScalar = 1f;
+    public float patrolCycleOffset = 0f;
     //public float playerYToForceDeAggro = 5f;
 
 
@@ -68,6 +74,7 @@ public class PaperEnemy : Hazard
     }
 
     private Vector3 homePos;
+    [HideInInspector]
     public EnemyState currState = EnemyState.patrolling;
     private float attackWaitTimer = 0;
     private float attackWaitTime;
@@ -172,8 +179,13 @@ public class PaperEnemy : Hazard
 	private void OnDrawGizmosSelected()
 	{
         Gizmos.color = Color.red;
-        DrawGizmoCircle(transform.position + (Vector3.up * aggroHeight), aggroRange);   //
-        DrawGizmoCircle(transform.position + (Vector3.down * aggroHeight), aggroRange); // inaccurate in play mode, since it'll follow the enemy when the range is actually stationary
+        DrawGizmoCircle(transform.position + (Vector3.up * aggroHeightUp), aggroRange);     //
+        DrawGizmoCircle(transform.position + (Vector3.down * aggroHeightDown), aggroRange); // inaccurate in play mode, since it'll follow the enemy when the range is actually stationary
+        
+        Gizmos.color = Color.green;
+        DrawGizmoCircle(transform.position + (Vector3.up * (aggroHeightUp + extraHeightUpToDeaggro)), aggroRange + extraRangeToDeaggro);
+        DrawGizmoCircle(transform.position + (Vector3.down * (aggroHeightDown + extraHeightDownToDeaggro)), aggroRange + extraRangeToDeaggro);
+
     }
 
 	private void DrawGizmoCircle(Vector3 position, float radius)
@@ -347,10 +359,12 @@ public class PaperEnemy : Hazard
 
     private void DeadUpdate()
     {
-        velocity = (homePos - transform.position).normalized * respawnDriftSpeed;
+        //velocity = (homePos - transform.position).normalized * respawnDriftSpeed;
 
         // dead state disables the controller so we can pass through walls, so move using the transform directly
-        transform.position += velocity * Time.deltaTime;
+        //transform.position += velocity * Time.deltaTime;
+
+        transform.position = Vector3.MoveTowards(transform.position, homePos, respawnDriftSpeed * Time.deltaTime);
 
         if ( timer < (StaticValues.hardMode ? respawnTimeHard : respawnTime) )
         {
@@ -365,11 +379,11 @@ public class PaperEnemy : Hazard
 	private void PatrolUpdate() 
     {
         Vector3 diff = GetPatrolPositionForTime(Time.time) - transform.position;
-        velocity = Vector3.ClampMagnitude(diff, generalSpeed * 100);
+        velocity = Vector3.ClampMagnitude(diff, generalSpeed * 100); //ayy lmao
 
         //if (Vector3.Distance(transform.position, GetVec3ToPlayer()) < aggroRange)
         //if (GetVec3ToPlayer().magnitude < aggroRange)
-        if (PlayerInCylinderRange(aggroHeight, aggroRange))
+        if (PlayerInCylinderRange(aggroHeightUp, aggroHeightDown, aggroRange))
         {
             ChangeState(EnemyState.aggro);
         }
@@ -378,6 +392,7 @@ public class PaperEnemy : Hazard
     private Vector3 GetPatrolPositionForTime(float time)
     {
         time *= reversePatrolDirection ? -1 : 1;
+        time += patrolCycleOffset;
         float circumfrence = 2 * Mathf.PI * patrolRadius;
         float scalar = 2 * Mathf.PI * (generalSpeed / circumfrence);
         float x = Mathf.Cos(time * scalar * patrolSpeedScalar) * patrolRadius;
@@ -434,7 +449,7 @@ public class PaperEnemy : Hazard
 
     private void AggroUpdate()
     {
-        if ( ! PlayerInCylinderRange(aggroHeight, aggroRange) )
+        if ( ! PlayerInCylinderRange(aggroHeightUp + extraHeightUpToDeaggro, aggroHeightDown + extraHeightDownToDeaggro, aggroRange + extraRangeToDeaggro) )
         {
             ChangeState(EnemyState.patrolling);
             return;
@@ -508,8 +523,8 @@ public class PaperEnemy : Hazard
     {
         return Random.Range
         (
-            StaticValues.hardMode ? minTimeBeforeAttackHard : minInRangeTimeBeforeAttack, 
-            maxInRangeTimeBeforeAttack
+            StaticValues.hardMode ? minTimeBeforeAttackHard : minInRangeTimeBeforeAttack,
+            StaticValues.hardMode ? maxTimeBeforeAttackHard : maxInRangeTimeBeforeAttack
         );
     }
 
@@ -578,14 +593,14 @@ public class PaperEnemy : Hazard
         velocity = Tools.MinAbsMagnitude(diffToTarget / Time.deltaTime, diffToTarget.normalized * speed);
     }
 
-    private bool PlayerInCylinderRange(float cylHalfHeight, float cylRadius)
+    private bool PlayerInCylinderRange(float cylHalfHeightUp, float cylHalfHeightDown, float cylRadius)
     {
-        Vector3 homeToPlayer = homePos - player.transform.position;
+        Vector3 homeToPlayer = player.transform.position - homePos;
         Vector2 homeToPlayerHor = new Vector2(homeToPlayer.x, homeToPlayer.z);
 
         return (
-            homeToPlayer.y > -cylHalfHeight &&
-            homeToPlayer.y < cylHalfHeight &&
+            homeToPlayer.y > -cylHalfHeightDown &&
+            homeToPlayer.y < cylHalfHeightUp &&
             homeToPlayerHor.magnitude < cylRadius
         );
     }
