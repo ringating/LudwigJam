@@ -1551,8 +1551,10 @@ MonoBehaviour:
   attackPullBackDistance: 3
   attackPullBackTime: 0.5
   attackPullBackSmoothingRate: 0.01
-  attackSphereRadius: 2
+  attackSphereRadius: 1.5
   hazardousRadius: 1.5
+  attackParryRadius: 2
+  hazardParryRadius: 2
   playerAttackSphereRadius: 2
   minInRangeTimeBeforeAttack: 1
   minTimeBeforeAttackHard: 0.1

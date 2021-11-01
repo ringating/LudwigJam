@@ -9,6 +9,7 @@ public class ShowHelperSprites : MonoBehaviour
     public SpriteTurnSegments crosshair;
     public float fistIconDuration = 1.5f;
     public bool disableFist;
+    public bool disableOldPlat;
     
     private PlayerController player;
     private float attackIconTimer;
@@ -36,7 +37,7 @@ public class ShowHelperSprites : MonoBehaviour
         // line
 
         //bool hasBeenRealGroundedSinceSuccessfulParry;
-        bool lineOn = player.GetGrounded() && !player.controller.isGrounded;
+        bool lineOn = player.GetGrounded() && !player.controller.isGrounded && !disableOldPlat;
 
         if (lineWasOn && !lineOn)
         {

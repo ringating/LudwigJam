@@ -12,9 +12,9 @@ public static class SettingsStatic
 
     static SettingsStatic()
     {
-        volume = 0.1f;
+        volume = 0.25f;
         sensitivity = 1f;
-        musicVolume = 0.25f; // must also change in the music source for this to work on game start (this probably isnt the case anymore)
+        musicVolume = 0.25f;
         showProgress = true;
         showTimer = true;
     }

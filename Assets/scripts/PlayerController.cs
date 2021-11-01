@@ -29,6 +29,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public AudioClip landingSound;
     public AudioClip plummetBounceSound;
     public AudioClip getUpSound;
+    //public AudioClip splatSound; // might not be necessary, can just use existing plummet bounce sound
 
     public Rigidbody plummeter;
 
@@ -48,7 +49,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public float chargeGravity = 10f;
     public float airControlAccel = 30f;
     public float maxHorizontalAirSpeed = 7f;
-    public float fallSpeedToPlummet = 60f;
+    public float fallSpeedToPlummet = 60f; // hard mode only now
+    public float fallSpeedToSplat = 60f; // if greater than the above value, then only matters in easy mode
     //public float maxFallSpeed = 100f;
     public float chargeStartupTime;
     public float maxChargeTime = 1f;
@@ -84,8 +86,11 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     [HideInInspector]
     public Vector3 velocity;
+    [HideInInspector]
+    public Vector3 prevVelocity;
     private Vector3 prevPosition;
-    private PlayerState prevState;
+    [HideInInspector]
+    public PlayerState prevState;
     [HideInInspector]
     public PlayerState currState;
 
@@ -121,7 +126,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
         airRecoveryTimer = timerDuration;
         airRecoveryTime = timerDuration;
     }
-    private float airRecoveryTimer = 0;
+    private float airRecoveryTimer = 0f;
     private float airRecoveryTime = 3f;
     public float recoveryRemaining
     {
@@ -133,6 +138,15 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public float airRecoveryTimeInEasyMode = 3f;
     public float airRecoveryHeight = 10f; // air recovery can only occur if the player is lower than this height from where they were launched
 
+    public float parryPlatformRemaining 
+    {
+        get
+        {
+            float ret = (groundedTimeAfterParryHit - timeSinceSuccessfulParry) / groundedTimeAfterParryHit;
+            return Mathf.Clamp01(ret);
+        } 
+    }
+
     public float stillGetUpRemaining
     {
         get
@@ -143,10 +157,10 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     void Start()
     {
-        if (!StaticValues.hardMode)
+        /*if (!StaticValues.hardMode)
         {
             fallSpeedToPlummet = float.MaxValue;
-        }
+        }*/
 
         timeSinceDashEnded = parryDashLeniencyTime + 1f;
 
@@ -176,6 +190,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
     void Update()
     {
+        prevVelocity = velocity;
         UpdateAccordingToState();
         MaybeFadeOutChargeSound();
 
@@ -221,7 +236,10 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     break;
 
                 case PlayerState.fall:
-                    fallPose.forceHideAndDisable();
+                    if(fallPose.visible)
+                        fallPose.forceHideAndDisable();
+                    if (plummetPose.visible)
+                        plummetPose.forceHideAndDisable();
                     break;
 
                 case PlayerState.parry:
@@ -249,6 +267,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     //usedPunchThisAirborne = false; // give them their dash back, only really useful in easy mode or after mercy rule
                     GiveParryBenefits();             // actually maybe this instead
                     //generalSoundPlayer.PlayOneShot(getUpSound, 0.8f); // only do this if recovering due to standstill
+                    velocity = Vector3.zero; // v v v
+                    prevVelocity = velocity; // these are to fix a bug w/ splat triggering after air recovery from a hit that happened while falling fast enought to splat
                     break;
 
                 default:
@@ -282,6 +302,7 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     break;
 
                 case PlayerState.plummet:
+                    //airRecoveryTimer = 0; // this breaks things, don't do this
                     plummetPose.enabled = true;
                     timer = 0;
                     if (prevState != PlayerState.plummet) timer2 = 0; // don't reset the mercy timer if prev state was also plummet, lol
@@ -383,8 +404,9 @@ public class PlayerController : CanReceiveMessageFromAnimation
                     {
                         ChangeState(PlayerState.jump);
                     }
-                    else if (velocity.y < -fallSpeedToPlummet)
+                    else if (StaticValues.hardMode && velocity.y < -fallSpeedToPlummet)
                     {
+                        startAirRecoveryTimer(1337); // value doesnt matter, gets overwritten in hard mode but this only gets called in hard mode
                         ChangeState(PlayerState.plummet);
                     }
                 }
@@ -420,6 +442,13 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
             case PlayerState.dodge:
                 velocity = getVelocityForward(dodgeAnimation.time < dodgeAnimation.durations[0] ? dodgeSpeedA : dodgeSpeedB);
+                if (controller.isGrounded)
+                {
+                    velocity += Vector3.down;
+                    // little bit of fake gravity to make dodge actually count as grounded, and therefore not show the platform
+                    // but for some reason this only sometimes works...
+                    // nevermind, fixed via some jankery in UpdateSharedBetweenIdleAndRun
+                }
                 break;
 
             case PlayerState.plummet:
@@ -435,8 +464,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
 
         if (grounded)
         {
-            bool changedState = dodgeMaybe();
-            changedState = changedState || jumpMaybe();
+            dodgeMaybe(); // excluding this from the changedState bool helps fix the air platform from showing up during dodge
+            bool changedState = jumpMaybe();
             changedState = changedState || ParryMaybe();
 
             if (!changedState)
@@ -889,12 +918,34 @@ public class PlayerController : CanReceiveMessageFromAnimation
     {
         //generalSoundPlayer.PlayOneShot(dashPunchHitSound, 0.5f);
         GlobalObjects.timeControllerStatic.TempChangeTimescale(0.05f, 0f, 0.3f, 0f);
-        timeSinceSuccessfulAttack = 0;
+        if (groundedTimeAfterAttackHit > 0)
+        {
+            timeSinceSuccessfulAttack = 0;
+        }
     }
 
     public void GiveParryBenefits()
     {
         timeSinceSuccessfulParry = 0;
         parrySuccessful = true;
+    }
+
+    public void Splat()
+    {
+        startAirRecoveryTimer(airRecoveryTimeInEasyMode);
+        
+        velocity = Vector3.zero;
+        plummeter.velocity = Vector3.zero;
+
+        EnablePlummeterAndDisableController(false);
+
+        ChangeState(PlayerState.plummet);
+    }
+
+    public void SwitchFallToPlummetVisual() //switches to the plummet visual without actually going into the plummet state
+    {
+        if (fallPose.visible)
+            fallPose.forceHideAndDisable();
+        plummetPose.enabled = true;
     }
 }

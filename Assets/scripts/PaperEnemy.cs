@@ -29,8 +29,10 @@ public class PaperEnemy : Hazard
     public float attackPullBackDistance = 1f;
     public float attackPullBackTime = 0.25f;
     public float attackPullBackSmoothingRate = 0.01f;
-    public float attackSphereRadius = 2f;
-    public float hazardousRadius = 1f;
+    public float attackSphereRadius = 1.5f;
+    public float hazardousRadius = 1.5f;
+    public float attackParryRadius = 2f;
+    public float hazardParryRadius = 2f;
     public float playerAttackSphereRadius = 2f;
     public float minInRangeTimeBeforeAttack = 1f; // how long the enemy will sit still before attacking
     public float minTimeBeforeAttackHard = 0.1f;
@@ -536,7 +538,7 @@ public class PaperEnemy : Hazard
 
     private void TryAttack()
     {
-        if (Vector3.Distance(GlobalObjects.playerStatic.transform.position, transform.position) < attackSphereRadius)
+        if (Vector3.Distance(GlobalObjects.playerStatic.transform.position, transform.position) < (player.inParryActiveWindow ? attackParryRadius : attackSphereRadius))
         {
             GlobalObjects.playerStatic.OnEnemyAttackHit(this);
         }
@@ -574,7 +576,7 @@ public class PaperEnemy : Hazard
         (
             player.currState != PlayerController.PlayerState.attack &&
             (currState == EnemyState.patrolling || currState == EnemyState.aggro || currState == EnemyState.attackStartup) &&
-            distanceToPlayer < hazardousRadius
+            distanceToPlayer < (player.inParryActiveWindow ? hazardParryRadius : hazardousRadius)
         )
         {
             player.OnEnemyAttackHit(this);
