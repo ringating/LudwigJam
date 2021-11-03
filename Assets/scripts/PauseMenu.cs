@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class PauseMenu : MonoBehaviour
     public Slider volumeSlider;
     public AudioSource audioSource;
 
+    public GameObject mainMenuButton;
+    public GameObject mainMenuScreen;
+
     private float defaultSens = 1f;
 
     public bool paused { get { return toToggle.activeSelf; } }
@@ -20,6 +24,7 @@ public class PauseMenu : MonoBehaviour
 	private void Start()
 	{
         sensitivityInput.text = "" + SettingsStatic.sensitivity;
+        MaybeEnableGameplayOnlyUI();
     }
 
 	void Update()
@@ -48,6 +53,16 @@ public class PauseMenu : MonoBehaviour
     public void HideExitGameScreen()
     {
         exitGameScreen.SetActive(false);
+    }
+
+    public void ShowMainMenuScreen()
+    {
+        mainMenuScreen.SetActive(true);
+    }
+
+    public void HideMainMenuScreen()
+    {
+        mainMenuScreen.SetActive(false);
     }
 
     public void ExitGame()
@@ -112,5 +127,18 @@ public class PauseMenu : MonoBehaviour
         {
             cooldownTimer -= Time.deltaTime;
         }
+    }
+
+    private void MaybeEnableGameplayOnlyUI()
+    {
+        if (SceneManager.GetActiveScene().buildIndex == 1) // gameplay scene
+        {
+            mainMenuButton.SetActive(true);
+        }
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
