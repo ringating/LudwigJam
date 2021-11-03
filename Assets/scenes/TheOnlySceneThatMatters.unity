@@ -42117,7 +42117,7 @@ GameObject:
   - component: {fileID: 1807919943}
   - component: {fileID: 1807919944}
   - component: {fileID: 1807919945}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: plummeter
   m_TagString: PlayerRigidBody
   m_Icon: {fileID: 0}
