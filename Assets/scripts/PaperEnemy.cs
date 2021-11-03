@@ -16,9 +16,11 @@ public class PaperEnemy : Hazard
     public SpriteTurnSegments deadSprite1;
     public SpriteTurnSegments deadSprite2;
 
+    public SpriteTurnSegments alertSprite;
+
     public CharacterController controller;
 
-    public float maxDistanceFromHome = 30f;
+    //public float maxDistanceFromHome = 30f;
     public float minReturnHomeTime = 4f;
     public Color parriedTint;
     public float generalSpeed = 15f;
@@ -27,28 +29,41 @@ public class PaperEnemy : Hazard
     public float attackPullBackDistance = 1f;
     public float attackPullBackTime = 0.25f;
     public float attackPullBackSmoothingRate = 0.01f;
-    public float attackSphereRadius = 2f;
-    public float hazardousRadius = 1f;
+    public float attackSphereRadius = 1.5f;
+    public float hazardousRadius = 1.5f;
+    public float attackParryRadius = 2f;
+    public float hazardParryRadius = 2f;
     public float playerAttackSphereRadius = 2f;
-    public float minInRangeTimeBeforeAttack = 0f; // how long the enemy will sit still before attacking
-    public float maxInRangeTimeBeforeAttack = 5f; //
+    public float minInRangeTimeBeforeAttack = 1f; // how long the enemy will sit still before attacking
+    public float minTimeBeforeAttackHard = 0.1f;
+    public float maxInRangeTimeBeforeAttack = 5f;
+    public float maxTimeBeforeAttackHard = 3f;
     public float aggroTargetHeight;       // plane tries to fly here when aggro, 
     public float aggroTargetStopDistance; // and will stop flying if it gets at least this close,
     public float attackTimerStartDistance; // and will start flying again if the player gets this far away
     public float aggroRandomOffsetMaxDistance = 2;
     public float parryStunTime = 3f;
     public float stuckStunTime = 1f;
-    public float respawnTime = 5f;
+    public float respawnTime = 10f;
+    public float respawnTimeHard = 5f;
     public float respawnDriftSpeed = 5f;
     public bool reversePatrolDirection;
     public float patrolRadius;
     public float aggroRange;
+    public float aggroHeightUp = 5f;
+    public float aggroHeightDown = 5f;
+    public float extraRangeToDeaggro = 5f;
+    public float extraHeightUpToDeaggro = 3f;
+    public float extraHeightDownToDeaggro = 3f;
+    public float aggroMoveSpeed = 5f;
     public float patrolSpeedScalar = 1f;
+    public float patrolCycleOffset = 0f;
+    //public float playerYToForceDeAggro = 5f;
 
 
     // MUST BE TRUE: aggroRange > attackTimerStartDistance > (aggroTargetStopDistance + aggroRandomOffsetMaxDistance)
 
-    private enum EnemyState
+    public enum EnemyState
     {
         patrolling,     // flying along a fixed path, waiting for player to get in aggro range
         aggro,          // chasing player
@@ -56,19 +71,20 @@ public class PaperEnemy : Hazard
         attacking,      // diving, attack hitbox active
         stuck,          // if the enemy hits terrain during the attack, they get stuck there for a time
         stunned,        // the state when it's been parried by the player. frozen, vulnerable
-        dead,            // puff of shredded paper, floats in place and interacts with nothing. after a time, re-enters patrolling state
+        dead,           // puff of shredded paper, floats in place and interacts with nothing. after a time, re-enters patrolling state
         forceReturnHome
     }
 
     private Vector3 homePos;
-    private EnemyState currState = EnemyState.patrolling;
+    [HideInInspector]
+    public EnemyState currState = EnemyState.patrolling;
     private float attackWaitTimer = 0;
     private float attackWaitTime;
     private Vector3 randomWaitPosOffset;
     private float timer = 0;
     private Vector3 velocity;
     private PlayerController player;
-    private bool aggrodAndMustMove = true;
+    //private bool aggrodAndMustMove = true;
     private Vector3 attackDir;
     private Vector3 pullBackTargetPos;
     private Vector3 currPullBackPos;
@@ -87,6 +103,7 @@ public class PaperEnemy : Hazard
 
         deadSprite1.forceHideAndDisable();
         deadSprite2.forceHideAndDisable();
+        alertSprite.forceHideAndDisable();
 
         controller.detectCollisions = false;
 	}
@@ -116,10 +133,20 @@ public class PaperEnemy : Hazard
             }
         }
 
-        if (currState != EnemyState.forceReturnHome && Vector3.Distance(transform.position, homePos) > maxDistanceFromHome)
+        /*if (
+            currState != EnemyState.forceReturnHome && 
+            currState != EnemyState.dead && 
+            currState != EnemyState.stunned &&
+            currState != EnemyState.patrolling &&
+            (
+                Vector3.Distance(transform.position, homePos) > maxDistanceFromHome || 
+                (!StaticValues.hardMode && player.transform.position.y > homePos.y + playerYToForceDeAggro)
+            )
+        )
         {
             ChangeState(EnemyState.forceReturnHome);
-        }
+        }*/
+        
 	}
 
     private void SetControllerPos(Vector3 targetPos)
@@ -142,8 +169,43 @@ public class PaperEnemy : Hazard
             print(velocity);
         }
 
+        //Gizmos.color = Color.red;
+        //Gizmos.DrawWireSphere(transform.position, aggroRange);
+
+        /*Gizmos.color = Color.blue;
+        Vector3 pos = transform.position + (Vector3.up * playerYToForceDeAggro);
+        Gizmos.DrawLine(pos + Vector3.forward, pos + Vector3.back);
+        Gizmos.DrawLine(pos + Vector3.left, pos + Vector3.right);*/
+    }
+
+	private void OnDrawGizmosSelected()
+	{
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, aggroRange);
+        DrawGizmoCircle(transform.position + (Vector3.up * aggroHeightUp), aggroRange);     //
+        DrawGizmoCircle(transform.position + (Vector3.down * aggroHeightDown), aggroRange); // inaccurate in play mode, since it'll follow the enemy when the range is actually stationary
+        
+        Gizmos.color = Color.green;
+        DrawGizmoCircle(transform.position + (Vector3.up * (aggroHeightUp + extraHeightUpToDeaggro)), aggroRange + extraRangeToDeaggro);
+        DrawGizmoCircle(transform.position + (Vector3.down * (aggroHeightDown + extraHeightDownToDeaggro)), aggroRange + extraRangeToDeaggro);
+
+    }
+
+	private void DrawGizmoCircle(Vector3 position, float radius)
+    {
+        Vector3[] points = new Vector3[50];
+        float rPer = (2 * Mathf.PI) / points.Length;
+        for (int i = 0; i < points.Length; ++i)
+        {
+            float r = rPer * i;
+            points[i] = position + ( radius * new Vector3(Mathf.Cos(r), 0, Mathf.Sin(r)) );
+        }
+
+        for (int i = 1; i < points.Length; ++i)
+        {
+            Gizmos.DrawLine(points[i-1], points[i]);
+        }
+
+        Gizmos.DrawLine(points[points.Length-1], points[0]);
     }
 
     private void ChangeState(EnemyState newState)
@@ -154,6 +216,7 @@ public class PaperEnemy : Hazard
                 break;
 
             case EnemyState.aggro:
+                alertSprite.forceHideAndDisable();
                 break;
 
             case EnemyState.attackStartup:
@@ -192,7 +255,8 @@ public class PaperEnemy : Hazard
                 attackWaitTimer = 0;
                 attackWaitTime = GetNewAttackWaitTime();
                 randomWaitPosOffset = GetNewWaitPosOffset();
-                aggrodAndMustMove = true;
+                alertSprite.enabled = true;
+                //aggrodAndMustMove = true;
                 break;
 
             case EnemyState.attackStartup:
@@ -297,12 +361,14 @@ public class PaperEnemy : Hazard
 
     private void DeadUpdate()
     {
-        velocity = (homePos - transform.position).normalized * respawnDriftSpeed;
+        //velocity = (homePos - transform.position).normalized * respawnDriftSpeed;
 
         // dead state disables the controller so we can pass through walls, so move using the transform directly
-        transform.position += velocity * Time.deltaTime;
+        //transform.position += velocity * Time.deltaTime;
 
-        if (timer < respawnTime)
+        transform.position = Vector3.MoveTowards(transform.position, homePos, respawnDriftSpeed * Time.deltaTime);
+
+        if ( timer < (StaticValues.hardMode ? respawnTimeHard : respawnTime) )
         {
             timer += Time.deltaTime;
         }
@@ -315,9 +381,11 @@ public class PaperEnemy : Hazard
 	private void PatrolUpdate() 
     {
         Vector3 diff = GetPatrolPositionForTime(Time.time) - transform.position;
-        velocity = Vector3.ClampMagnitude(diff, generalSpeed * 100);
+        velocity = Vector3.ClampMagnitude(diff, generalSpeed * 100); //ayy lmao
 
-        if (Vector3.Distance(transform.position, player.transform.position) < aggroRange)
+        //if (Vector3.Distance(transform.position, GetVec3ToPlayer()) < aggroRange)
+        //if (GetVec3ToPlayer().magnitude < aggroRange)
+        if (PlayerInCylinderRange(aggroHeightUp, aggroHeightDown, aggroRange))
         {
             ChangeState(EnemyState.aggro);
         }
@@ -326,6 +394,7 @@ public class PaperEnemy : Hazard
     private Vector3 GetPatrolPositionForTime(float time)
     {
         time *= reversePatrolDirection ? -1 : 1;
+        time += patrolCycleOffset;
         float circumfrence = 2 * Mathf.PI * patrolRadius;
         float scalar = 2 * Mathf.PI * (generalSpeed / circumfrence);
         float x = Mathf.Cos(time * scalar * patrolSpeedScalar) * patrolRadius;
@@ -333,9 +402,10 @@ public class PaperEnemy : Hazard
         return new Vector3(homePos.x + x, homePos.y, homePos.z + z);
     }
 
-    private void AggroUpdate()
+    /*private void AggroUpdateOld()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        //float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        float distanceToPlayer = GetVec3ToPlayer().magnitude;
 
         if (distanceToPlayer > aggroRange + 0.5f) // a little extra distance to prevent vibrating in/out of aggro
         {
@@ -377,6 +447,26 @@ public class PaperEnemy : Hazard
         {
             aggrodAndMustMove = true;
         }
+    }*/
+
+    private void AggroUpdate()
+    {
+        if ( ! PlayerInCylinderRange(aggroHeightUp + extraHeightUpToDeaggro, aggroHeightDown + extraHeightDownToDeaggro, aggroRange + extraRangeToDeaggro) )
+        {
+            ChangeState(EnemyState.patrolling);
+            return;
+        }
+
+        MoveTowardsPos(GetAggroTargetPos(), aggroMoveSpeed);
+
+        if (attackWaitTimer > attackWaitTime)
+        {
+            attackWaitTimer = 0;
+            ChangeState(EnemyState.attackStartup);
+            return;
+        }
+
+        attackWaitTimer += Time.deltaTime;
     }
 
     private void AttackStartupUpdate()
@@ -433,7 +523,11 @@ public class PaperEnemy : Hazard
 
 	private float GetNewAttackWaitTime()
     {
-        return Random.Range(minInRangeTimeBeforeAttack, maxInRangeTimeBeforeAttack);
+        return Random.Range
+        (
+            StaticValues.hardMode ? minTimeBeforeAttackHard : minInRangeTimeBeforeAttack,
+            StaticValues.hardMode ? maxTimeBeforeAttackHard : maxInRangeTimeBeforeAttack
+        );
     }
 
 	private Vector3 GetNewWaitPosOffset()
@@ -444,7 +538,7 @@ public class PaperEnemy : Hazard
 
     private void TryAttack()
     {
-        if (Vector3.Distance(GlobalObjects.playerStatic.transform.position, transform.position) < attackSphereRadius)
+        if (Vector3.Distance(GlobalObjects.playerStatic.transform.position, transform.position) < (player.inParryActiveWindow ? attackParryRadius : attackSphereRadius))
         {
             GlobalObjects.playerStatic.OnEnemyAttackHit(this);
         }
@@ -482,10 +576,44 @@ public class PaperEnemy : Hazard
         (
             player.currState != PlayerController.PlayerState.attack &&
             (currState == EnemyState.patrolling || currState == EnemyState.aggro || currState == EnemyState.attackStartup) &&
-            distanceToPlayer < hazardousRadius
+            distanceToPlayer < (player.inParryActiveWindow ? hazardParryRadius : hazardousRadius)
         )
         {
             player.OnEnemyAttackHit(this);
         }
+    }
+
+    private Vector3 GetVec3ToPlayer()
+    {
+        //return player.transform.position - (StaticValues.hardMode ? transform.position : homePos);
+        return player.transform.position - transform.position;
+    }
+
+    private void MoveTowardsPos(Vector3 posTarget, float speed)
+    {
+        Vector3 diffToTarget = posTarget - transform.position;
+        velocity = Tools.MinAbsMagnitude(diffToTarget / Time.deltaTime, diffToTarget.normalized * speed);
+    }
+
+    private bool PlayerInCylinderRange(float cylHalfHeightUp, float cylHalfHeightDown, float cylRadius)
+    {
+        Vector3 homeToPlayer = player.transform.position - homePos;
+        Vector2 homeToPlayerHor = new Vector2(homeToPlayer.x, homeToPlayer.z);
+
+        return (
+            homeToPlayer.y > -cylHalfHeightDown &&
+            homeToPlayer.y < cylHalfHeightUp &&
+            homeToPlayerHor.magnitude < cylRadius
+        );
+    }
+
+    private Vector3 GetAggroTargetPos()
+    {
+        Vector3 toPlayer = GetVec3ToPlayer();
+        Vector3 toPlayerHor = new Vector3(toPlayer.x, 0, toPlayer.z);
+
+        Vector3 actualTargetPos = player.transform.position + ((-toPlayerHor.normalized) * aggroTargetStopDistance) + (Vector3.up * aggroTargetHeight) + randomWaitPosOffset;
+
+        return Tools.DampVec3(transform.position, actualTargetPos, 0.1f, Time.deltaTime);
     }
 }

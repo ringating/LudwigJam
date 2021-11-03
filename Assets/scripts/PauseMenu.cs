@@ -7,6 +7,8 @@ public class PauseMenu : MonoBehaviour
 {
     public GameObject toToggle;
     public GameObject controlsScreen;
+    public GameObject exitGameScreen;
+    public GameObject exitGameButton;
     public InputField sensitivityInput;
     public Slider volumeSlider;
     public AudioSource audioSource;
@@ -17,7 +19,6 @@ public class PauseMenu : MonoBehaviour
 
 	private void Start()
 	{
-        AudioListener.volume = volumeSlider.value;
         sensitivityInput.text = "" + SettingsStatic.sensitivity;
     }
 
@@ -37,6 +38,21 @@ public class PauseMenu : MonoBehaviour
     public void HideControlsScreen()
     {
         controlsScreen.SetActive(false);
+    }
+
+    public void ShowExitGameScreen()
+    {
+        exitGameScreen.SetActive(true);
+    }
+
+    public void HideExitGameScreen()
+    {
+        exitGameScreen.SetActive(false);
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 
     public void SensChanged()
@@ -70,6 +86,11 @@ public class PauseMenu : MonoBehaviour
         else
         {
             Cursor.lockState = CursorLockMode.None;
+        }
+
+        if (!unpausing && Application.platform != RuntimePlatform.WebGLPlayer)
+        {
+            exitGameButton.SetActive(true);
         }
     }
 

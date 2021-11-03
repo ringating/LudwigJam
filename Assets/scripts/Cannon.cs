@@ -15,6 +15,8 @@ public class Cannon : MonoBehaviour
     public float timeBetweenShots;
     public float shotTimingOffset;
 
+    public bool addShadowToCannonBalls = false;
+
     private int shotInterval;
 
     // Start is called before the first frame update
@@ -52,5 +54,10 @@ public class Cannon : MonoBehaviour
         CannonBall ball = ballObj.GetComponent<CannonBall>();
         ball.lifeTime = projectileLife;
         ball.velocity = (fireFrom.position - bodyTransform.position).normalized * projectileSpeed;
+
+        if (addShadowToCannonBalls)
+        {
+            ball.InstantiateShadow();
+        }
     }
 }

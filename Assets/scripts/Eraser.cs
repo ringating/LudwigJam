@@ -18,7 +18,9 @@ public class Eraser : MonoBehaviour
     private float moveTime;
 
     private float timer;
-    
+
+    private const float lowestY = 1.22f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -82,5 +84,28 @@ public class Eraser : MonoBehaviour
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(failSafeLocation.position, failSafeRadius);
+    }
+
+    private float GetPercentCompletion()
+    {
+        float highestY = eraserLocations[eraserLocations.Length - 1].position.y;
+        return (player.transform.position.y - lowestY) / (highestY - lowestY);
+    }
+
+    public string GetPercentCompletionString()
+    {
+        float percentCompletion = GetPercentCompletion();
+
+        if (percentCompletion > 0.99f && !victoryScript.victory)
+        {
+            return "99.9%";
+        }
+
+        if (percentCompletion < 0f)
+        {
+            return "0%";
+        }
+
+        return (((float)Mathf.RoundToInt(percentCompletion * 1000f)) / 10f) + "%";
     }
 }

@@ -9,13 +9,14 @@ public class SpotShadow : MonoBehaviour
     public float maxShadowDistance = 10f;
 
     private LayerMask layerMask;
-    private WobbleSprite shadow;
+    public WobbleSprite shadow;
 
     // Start is called before the first frame update
     void Start()
     {
-        shadow = GetComponent<WobbleSprite>();
-        layerMask = ~LayerMask.NameToLayer("terrain");
+        //shadow = GetComponent<WobbleSprite>();
+        layerMask = LayerMask.GetMask("terrain");
+        shadow.forceHideAndDisable();
     }
 
 	// Update is called once per frame
@@ -26,7 +27,6 @@ public class SpotShadow : MonoBehaviour
 
 	void FixedUpdate()
     {
-        //RaycastHit hitInfo = new RaycastHit();
         if(Physics.Raycast(castFrom.position, Vector3.down, out RaycastHit hitInfo, maxShadowDistance, layerMask, QueryTriggerInteraction.Ignore))
         {
             shadow.enabled = true;
