@@ -5379,7 +5379,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8125115645931097830, guid: e6bc1605561e8ca48940086dd0dffa6d, type: 3}
       propertyPath: m_Name
-      value: Spike Platform 5x5x1 Variant (all sides spiked)
+      value: Spike Platform 5x5x1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e6bc1605561e8ca48940086dd0dffa6d, type: 3}
