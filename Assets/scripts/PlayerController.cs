@@ -138,6 +138,14 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public float airRecoveryTimeInEasyMode = 3f;
     public float airRecoveryHeight = 10f; // air recovery can only occur if the player is lower than this height from where they were launched
 
+    public bool spikePlummeting 
+    {
+        get
+        {
+            return currState == PlayerState.plummet && airRecoveryTimer > 1000f;
+        }
+    }
+
     public float parryPlatformRemaining 
     {
         get

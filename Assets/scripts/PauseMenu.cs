@@ -23,6 +23,15 @@ public class PauseMenu : MonoBehaviour
 
 	private void Start()
 	{
+        LoadSettings();
+
+        if (SceneManager.GetActiveScene().buildIndex == 0) // only do this on main menu
+        {
+            AudioSource musicSource = FindObjectOfType<LiveForeverObject>().GetComponent<AudioSource>();
+            musicSource.volume = SettingsStatic.musicVolume;
+        }
+
+        AudioListener.volume = SettingsStatic.volume; // cant remember if this is done elsewhere too, but can't hurt
         sensitivityInput.text = "" + SettingsStatic.sensitivity;
         MaybeEnableGameplayOnlyUI();
     }
@@ -31,6 +40,7 @@ public class PauseMenu : MonoBehaviour
     {
 		if (Input.GetButtonDown("Pause"))
         {
+            SaveSettings();
             TogglePauseMenu();
         }
     }
@@ -140,5 +150,15 @@ public class PauseMenu : MonoBehaviour
     public void GoToMainMenu()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void SaveSettings()
+    {
+        SettingsStatic.SaveSettings();
+    }
+
+    public void LoadSettings()
+    {
+        SettingsStatic.LoadSettings();
     }
 }
