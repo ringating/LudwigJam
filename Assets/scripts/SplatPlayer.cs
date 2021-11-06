@@ -18,7 +18,7 @@ public class SplatPlayer : MonoBehaviour
         bool wasFalling = player.prevState == PlayerController.PlayerState.fall;
         bool fastEnough = player.prevVelocity.y <= -player.fallSpeedToSplat;
 
-        print(player.prevVelocity.y + " < " + -player.fallSpeedToSplat + " ?");
+        //print(player.prevVelocity.y + " < " + -player.fallSpeedToSplat + " ?");
         
         if (splattableState && wasFalling && fastEnough)
         {

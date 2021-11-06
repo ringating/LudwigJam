@@ -19,6 +19,8 @@ public class Cannon : MonoBehaviour
 
     private int shotInterval;
 
+    private Stack<CannonBall> readyToReuse = new Stack<CannonBall>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -50,14 +52,42 @@ public class Cannon : MonoBehaviour
     {
         audioSource.PlayOneShot(shotSound);
 
-        GameObject ballObj = Instantiate(cannonBallToInstantiate, fireFrom.position, Quaternion.identity);
-        CannonBall ball = ballObj.GetComponent<CannonBall>();
+        CannonBall ball = GetNewCannonBall();
         ball.lifeTime = projectileLife;
         ball.velocity = (fireFrom.position - bodyTransform.position).normalized * projectileSpeed;
 
         if (addShadowToCannonBalls)
         {
-            ball.InstantiateShadow();
+            ball.InstantiateShadow(); // only does anything if the ball doesnt already have a shadow
         }
+    }
+
+    public void CannonBallTimeout(CannonBall ball)
+    {
+        readyToReuse.Push(ball);
+        ball.gameObject.SetActive(false);
+    }
+
+    private CannonBall GetNewCannonBall()
+    {
+        CannonBall ret;
+
+        if (readyToReuse.Count > 0)
+        {
+            ret = readyToReuse.Pop();
+            ret.ResetState();
+            GameObject obj = ret.gameObject;
+            obj.transform.position = fireFrom.position;
+            obj.SetActive(true);
+            print("reusing cannonball");
+        }
+        else
+        {
+            ret = Instantiate(cannonBallToInstantiate, fireFrom.position, Quaternion.identity).GetComponent<CannonBall>();
+            ret.cannon = this;
+            print("instantiating new cannonball");
+        }
+
+        return ret;
     }
 }

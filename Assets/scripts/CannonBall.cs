@@ -20,6 +20,8 @@ public class CannonBall : Hazard
     private float timeSinceParried;
     private bool wasDeactivated = false;
     private PlayerController player;
+    [HideInInspector]
+    public Cannon cannon;
 
 	private void Start()
 	{
@@ -36,7 +38,14 @@ public class CannonBall : Hazard
 
         if (lifeTimer > lifeTime)
         {
-            Destroy(gameObject);
+            if (cannon)
+            {
+                cannon.CannonBallTimeout(this);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         lifeTimer += Time.deltaTime;
@@ -96,5 +105,12 @@ public class CannonBall : Hazard
     public void InstantiateShadow()
     {
         addShadowScript.enabled = true;
+    }
+
+    public void ResetState()
+    {
+        timeSinceParried = parryDeactivateTime + 1;
+        lifeTimer = 0;
+        wasDeactivated = false;
     }
 }
