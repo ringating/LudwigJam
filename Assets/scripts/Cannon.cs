@@ -79,13 +79,13 @@ public class Cannon : MonoBehaviour
             GameObject obj = ret.gameObject;
             obj.transform.position = fireFrom.position;
             obj.SetActive(true);
-            print("reusing cannonball");
+            //print("reusing cannonball");
         }
         else
         {
             ret = Instantiate(cannonBallToInstantiate, fireFrom.position, Quaternion.identity).GetComponent<CannonBall>();
             ret.cannon = this;
-            print("instantiating new cannonball");
+            //print("instantiating new cannonball");
         }
 
         return ret;

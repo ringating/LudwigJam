@@ -112,5 +112,6 @@ public class CannonBall : Hazard
         timeSinceParried = parryDeactivateTime + 1;
         lifeTimer = 0;
         wasDeactivated = false;
+        visuals.SetTint(Color.white);
     }
 }
