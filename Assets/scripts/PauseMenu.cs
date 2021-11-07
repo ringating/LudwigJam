@@ -161,4 +161,9 @@ public class PauseMenu : MonoBehaviour
     {
         SettingsStatic.LoadSettings();
     }
+
+    public void ForceSavePlayerPrefs()
+    {
+        PlayerPrefs.Save();
+    }
 }

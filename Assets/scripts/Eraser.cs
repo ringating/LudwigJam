@@ -14,7 +14,8 @@ public class Eraser : MonoBehaviour
 
     private PlayerController player;
 
-    private int currLocationIndex;
+    [HideInInspector]
+    public int currLocationIndex;
     private float moveTime;
 
     private float timer;

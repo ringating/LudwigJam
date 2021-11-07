@@ -83,6 +83,8 @@ public class PlayerController : CanReceiveMessageFromAnimation
     public SpriteTurnSegments crosshairSprite;
     public ShowHelperSprites helperSprites;
     public StunStars stunStars;
+    public Eraser eraserScript;
+    public Victory victoryScript;
 
     [HideInInspector]
     public Vector3 velocity;
@@ -955,5 +957,67 @@ public class PlayerController : CanReceiveMessageFromAnimation
         if (fallPose.visible)
             fallPose.forceHideAndDisable();
         plummetPose.enabled = true;
+    }
+
+    public GameSaveData GetCurrSaveDataState()
+    {
+        GameSaveData ret = new GameSaveData();
+
+        Vector3 pos = transform.position;
+        ret.playerX = pos.x;
+        ret.playerY = pos.y;
+        ret.playerZ = pos.z;
+
+        ret.timePriorToCurrentSession = StaticValues.timePriorToCurrentSession + (Time.unscaledTime - victoryScript.startTime);
+        ret.progress = eraserScript.GetPercentCompletionString();
+        ret.hardMode = StaticValues.hardMode;
+
+        Vector3 vel = currState == PlayerState.plummet ? plummeter.velocity : velocity;
+        ret.velocityX = vel.x;
+        ret.velocityY = vel.y;
+        ret.velocityZ = vel.z;
+
+        ret.playerState = currState;
+
+        ret.eraserPosIndex = eraserScript.currLocationIndex;
+
+        return ret;
+    }
+
+    public void ApplyState(GameSaveData state)
+    {
+        if (state.playerState == PlayerState.plummet)
+        {
+            KnockedOut(Vector3.zero, 0, 0);
+            startAirRecoveryTimer(float.MaxValue);
+        }
+        else
+        {
+            ChangeState(state.playerState);
+        }
+        
+
+        Vector3 pos = new Vector3(state.playerX, state.playerY, state.playerZ);
+        Vector3 vel = new Vector3(state.velocityX, state.velocityY, state.velocityZ);
+
+        /*if (state.playerState == PlayerState.plummet)
+        {
+            plummeter.position = pos;
+            plummeter.velocity = vel;
+        }
+        else
+        {
+            transform.position = pos;
+            velocity = vel;
+        }*/
+
+        controller.enabled = false;
+         
+        plummeter.position = pos;
+        plummeter.velocity = vel;
+        transform.position = pos;
+        velocity = vel;
+
+        controller.enabled = true;
     }
 }

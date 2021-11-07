@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 35290583}
   - component: {fileID: 35290585}
   - component: {fileID: 35290584}
+  - component: {fileID: 35290586}
   m_Layer: 5
   m_Name: continue hover time
   m_TagString: Untagged
@@ -202,6 +203,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 35290582}
   m_CullTransparentMesh: 1
+--- !u!114 &35290586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 35290582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 738d54174fcca7244921535aa037c08a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timerText: {fileID: 35290584}
+  progressText: {fileID: 1081528501}
 --- !u!1 &115972908
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,6 +295,99 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 115972908}
+  m_CullTransparentMesh: 1
+--- !u!1 &122417446
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 122417447}
+  - component: {fileID: 122417450}
+  - component: {fileID: 122417449}
+  - component: {fileID: 122417448}
+  m_Layer: 5
+  m_Name: (off) hard mode new game image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &122417447
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122417446}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.33572757, y: 0.33572757, z: 0.33572757}
+  m_Children: []
+  m_Father: {fileID: 1837218941}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 119.712135, y: -36.057877}
+  m_SizeDelta: {x: 224, y: 238}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &122417448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122417446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eab9c82faf47f244fb5292ec919c0a67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 122417449}
+  sprites:
+  - {fileID: 21300000, guid: ead1e601028856744a158dd051df334c, type: 3}
+  - {fileID: 21300000, guid: a9e50f08a9b871849af7714cdfc76392, type: 3}
+  - {fileID: 21300000, guid: 1af1414aed7d7be45a3cc0967c1d0b70, type: 3}
+--- !u!114 &122417449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122417446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: ead1e601028856744a158dd051df334c, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &122417450
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122417446}
   m_CullTransparentMesh: 1
 --- !u!1 &246908814
 GameObject:
@@ -385,6 +493,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1526162337}
         m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
         m_MethodName: PlayUISound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1308184726}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: DenyNewGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -812,7 +932,31 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 369681560}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1308184726}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: ShowDeleteConfirm
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1526162337}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: PlayUISound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &369681560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -955,6 +1099,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1526162337}
         m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
         m_MethodName: PlayUISound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1308184726}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: DenyDelete
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1702,6 +1858,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1308184726}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: ConfirmDelete
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &876616258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2210,7 +2378,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1156447950}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1235132033}
+        m_TargetAssemblyTypeName: LoadPlayScene, Assembly-CSharp
+        m_MethodName: LoadScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1156447950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2361,7 +2541,19 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1235132033}
         m_TargetAssemblyTypeName: LoadPlayScene, Assembly-CSharp
-        m_MethodName: LoadScene
+        m_MethodName: MaybeLoadScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1526162337}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: PlayUISound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2438,6 +2630,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82bb50b4f16bce14da7684e7aaa7f4ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  newGameConfirmScreen: {fileID: 1837218940}
+  newGameConfirmScreenHardModeIndicator: {fileID: 122417446}
 --- !u!1 &1294188294
 GameObject:
   m_ObjectHideFlags: 0
@@ -2600,6 +2794,7 @@ GameObject:
   - component: {fileID: 1308184725}
   - component: {fileID: 1308184724}
   - component: {fileID: 1308184726}
+  - component: {fileID: 1308184727}
   m_Layer: 0
   m_Name: scripts
   m_TagString: Untagged
@@ -2647,7 +2842,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deleteConfirmScreen: {fileID: 902567079}
   newGameConfirmScreen: {fileID: 1837218940}
+  newGameConfirmScreenHardModeIndicator: {fileID: 122417446}
   hardModeContinueImage: {fileID: 906501465}
+  continueButton: {fileID: 1156447946}
+  loadPlayScene: {fileID: 1235132033}
+--- !u!114 &1308184727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308184723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9591aec8929e0bd4495fef961e626ca7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &1526162336 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3855451398808715457, guid: 7a23e973df0be9b49b7685cfcbeb1b06, type: 3}
@@ -2930,6 +3140,7 @@ RectTransform:
   - {fileID: 1917216540}
   - {fileID: 246908815}
   - {fileID: 115972909}
+  - {fileID: 122417447}
   m_Father: {fileID: 363111790}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3185,6 +3396,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1308184726}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: ConfirmNewGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1917216543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3315,7 +3538,6 @@ GameObject:
   - component: {fileID: 1976492217}
   - component: {fileID: 1976492219}
   - component: {fileID: 1976492216}
-  - component: {fileID: 1976492215}
   - component: {fileID: 1976492214}
   m_Layer: 5
   m_Name: play hard button
@@ -3388,9 +3610,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1976492215}
+      - m_Target: {fileID: 1235132033}
         m_TargetAssemblyTypeName: LoadPlayScene, Assembly-CSharp
-        m_MethodName: LoadSceneInHardMode
+        m_MethodName: MaybeLoadSceneInHardMode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3400,18 +3622,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1976492215
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1976492212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82bb50b4f16bce14da7684e7aaa7f4ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+      - m_Target: {fileID: 1526162337}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: PlayUISound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1976492216
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2880,6 +2880,7 @@ MonoBehaviour:
   lifeTime: 3.4028235e+38
   visuals: {fileID: 130216594}
   addShadowScript: {fileID: 0}
+  cannon: {fileID: 0}
 --- !u!1 &134632366
 GameObject:
   m_ObjectHideFlags: 0
@@ -9402,6 +9403,7 @@ MonoBehaviour:
   distanceToTriggerRunAway: 8
   distanceToTriggerFinalGoal: 1
   moveSpeed: 15
+  currLocationIndex: 0
 --- !u!114 &409057776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9422,6 +9424,7 @@ MonoBehaviour:
   eraserSoundSource: {fileID: 1887402931}
   mainMenuButton: {fileID: 1867114914}
   victory: 0
+  startTime: 0
 --- !u!1 &409800754
 GameObject:
   m_ObjectHideFlags: 0
@@ -14423,6 +14426,8 @@ MonoBehaviour:
   crosshairSprite: {fileID: 712190915}
   helperSprites: {fileID: 1061941358}
   stunStars: {fileID: 1198907063}
+  eraserScript: {fileID: 409057775}
+  victoryScript: {fileID: 409057776}
   velocity: {x: 0, y: 0, z: 0}
   prevVelocity: {x: 0, y: 0, z: 0}
   prevState: 0
@@ -15990,6 +15995,7 @@ MonoBehaviour:
   lifeTime: 3.4028235e+38
   visuals: {fileID: 636044086}
   addShadowScript: {fileID: 0}
+  cannon: {fileID: 0}
 --- !u!1001 &639516957
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31401,6 +31407,7 @@ MonoBehaviour:
   lifeTime: 3.4028235e+38
   visuals: {fileID: 1262469119}
   addShadowScript: {fileID: 0}
+  cannon: {fileID: 0}
 --- !u!1001 &1267146744
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34289,6 +34296,7 @@ MonoBehaviour:
   lifeTime: 3.4028235e+38
   visuals: {fileID: 1378824728}
   addShadowScript: {fileID: 0}
+  cannon: {fileID: 0}
 --- !u!1 &1383906987
 GameObject:
   m_ObjectHideFlags: 0
@@ -38137,6 +38145,7 @@ MonoBehaviour:
   lifeTime: 3.4028235e+38
   visuals: {fileID: 1572210873}
   addShadowScript: {fileID: 0}
+  cannon: {fileID: 0}
 --- !u!1001 &1573520485
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39949,6 +39958,7 @@ MonoBehaviour:
   lifeTime: 3.4028235e+38
   visuals: {fileID: 1644198489}
   addShadowScript: {fileID: 0}
+  cannon: {fileID: 0}
 --- !u!1 &1655957171
 GameObject:
   m_ObjectHideFlags: 0
@@ -45591,7 +45601,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 409057776}
         m_TargetAssemblyTypeName: Victory, Assembly-CSharp
-        m_MethodName: GoToMainMenuScene
+        m_MethodName: GoToMainMenuSceneAndDeleteSave
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -45955,7 +45965,8 @@ GameObject:
   - component: {fileID: 1876912009}
   - component: {fileID: 1876912011}
   - component: {fileID: 1876912012}
-  - component: {fileID: 1876912013}
+  - component: {fileID: 1876912015}
+  - component: {fileID: 1876912014}
   m_Layer: 0
   m_Name: scripts
   m_TagString: Untagged
@@ -46072,7 +46083,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6ec8e4314bc0aa40a83de0e96441392, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1876912013
+--- !u!114 &1876912014
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -46081,7 +46092,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 1876912005}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30608b4665bdb5f45b886fcceccba2da, type: 3}
+  m_Script: {fileID: 11500000, guid: 8e128a04e886d844cbdab0c8f1b2ce97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  followsFocalPoint: {fileID: 2053659321}
+  focalPoint: {fileID: 282152010}
+  eraser: {fileID: 409057775}
+--- !u!114 &1876912015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876912005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6bf97aabe044914aaca9e27cc972363, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1883411777
@@ -53273,6 +53299,7 @@ MonoBehaviour:
   lifeTime: 3.4028235e+38
   visuals: {fileID: 257038176473437597}
   addShadowScript: {fileID: 0}
+  cannon: {fileID: 0}
 --- !u!114 &257038176473437597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53815,6 +53842,7 @@ MonoBehaviour:
   lifeTime: 1e+35
   visuals: {fileID: 257038178087228879}
   addShadowScript: {fileID: 0}
+  cannon: {fileID: 0}
 --- !u!114 &257038178087228879
 MonoBehaviour:
   m_ObjectHideFlags: 0

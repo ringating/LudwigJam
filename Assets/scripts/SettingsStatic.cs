@@ -47,10 +47,22 @@ public static class SettingsStatic
         PlayerPrefs.SetFloat("timePriorToCurrentSession", saveData.timePriorToCurrentSession);
         PlayerPrefs.SetString("progress", saveData.progress);
         PlayerPrefs.SetInt("hardMode", saveData.hardMode ? 1 : 0);
+
+        PlayerPrefs.SetFloat("velocityX", saveData.velocityX);
+        PlayerPrefs.SetFloat("velocityY", saveData.velocityY);
+        PlayerPrefs.SetFloat("velocityZ", saveData.velocityZ);
+        PlayerPrefs.SetInt("playerState", (int)saveData.playerState);
+
+        PlayerPrefs.SetInt("eraserPosIndex", saveData.eraserPosIndex);
     }
 
     public static GameSaveData GetSavedGame()
     {
+        if (!SavedGameExists())
+        {
+            Debug.LogError("attempting to get saved game data when there's none saved!");
+        }
+
         GameSaveData ret = new GameSaveData();
 
         ret.playerX = PlayerPrefs.GetFloat("playerX", 5);
@@ -59,6 +71,13 @@ public static class SettingsStatic
         ret.timePriorToCurrentSession = PlayerPrefs.GetFloat("timePriorToCurrentSession", 0);
         ret.progress = PlayerPrefs.GetString("progress", "???");
         ret.hardMode = 1 == PlayerPrefs.GetInt("hardMode", 0);
+        
+        ret.velocityX = PlayerPrefs.GetFloat("velocityX", 0);
+        ret.velocityY = PlayerPrefs.GetFloat("velocityY", 0);
+        ret.velocityZ = PlayerPrefs.GetFloat("velocityZ", 0);
+        ret.playerState = (PlayerController.PlayerState)PlayerPrefs.GetInt("playerState", (int)PlayerController.PlayerState.fall);
+
+        ret.eraserPosIndex = PlayerPrefs.GetInt("eraserPosIndex", 0);
 
         return ret;
     }
@@ -68,7 +87,24 @@ public static class SettingsStatic
         return PlayerPrefs.HasKey("playerX"); // sufficient unless you mess up :)
     }
 
-    public static GameSaveData GetDefaultGameData()
+    public static void DeleteSavedGame()
+    {
+        PlayerPrefs.DeleteKey("playerX");
+        PlayerPrefs.DeleteKey("playerY");
+        PlayerPrefs.DeleteKey("playerZ");
+        PlayerPrefs.DeleteKey("timePriorToCurrentSession");
+        PlayerPrefs.DeleteKey("progress");
+        PlayerPrefs.DeleteKey("hardMode");
+        
+        PlayerPrefs.DeleteKey("velocityX");
+        PlayerPrefs.DeleteKey("velocityY");
+        PlayerPrefs.DeleteKey("velocityZ");
+        PlayerPrefs.DeleteKey("playerState");
+
+        PlayerPrefs.DeleteKey("eraserPosIndex");
+    }
+
+    public static GameSaveData GetStartingGameData() // used to spawn the player when there's no saved game, probably
     {
         GameSaveData ret = new GameSaveData();
 
@@ -76,13 +112,15 @@ public static class SettingsStatic
         ret.playerY = 1.22f;
         ret.playerZ = 5f;
         ret.timePriorToCurrentSession = 0f;
-        ret.progress = "???";
-        ret.hardMode = false;
+        ret.progress = "???"; // this shouldnt be used
+        ret.hardMode = StaticValues.hardMode;
 
         ret.velocityX = 0;
         ret.velocityY = 0;
         ret.velocityZ = 0;
-        ret.plumetting = false;
+        ret.playerState = PlayerController.PlayerState.fall;
+
+        ret.eraserPosIndex = 0;
 
         return ret;
     }
@@ -96,8 +134,11 @@ public struct GameSaveData
     public float timePriorToCurrentSession;
     public string progress;
     public bool hardMode;
+
     public float velocityX;
     public float velocityY;
     public float velocityZ;
-    public bool plumetting;
+    public PlayerController.PlayerState playerState;
+
+    public int eraserPosIndex;
 }

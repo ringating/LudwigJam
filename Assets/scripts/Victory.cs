@@ -19,7 +19,8 @@ public class Victory : MonoBehaviour
 	[HideInInspector]
 	public bool victory = false;
 	private bool oneTimeStuffDone = false;
-	private float startTime;
+	[HideInInspector]
+	public float startTime;
 	private float finalTime;
 	private float fadeSpeed = 0.2f;
 	private string timeString;
@@ -94,15 +95,16 @@ public class Victory : MonoBehaviour
 
 	public string GetTimeString(float currTime, bool includeMs)
 	{
-		float totalSeconds = currTime - startTime;
+		float totalSeconds = (currTime - startTime) + StaticValues.timePriorToCurrentSession;
+		return GetTimeStringFromTotalSeconds(totalSeconds, includeMs);
+	}
 
-		int hours = (int) (totalSeconds / (60f * 60f));
-		//print("total seconds: " + totalSeconds + ", hours: " + hours);
-		int minutes = (int) ( (totalSeconds - (hours * 60f * 60f)) / 60f );
-		int seconds = (int) ( totalSeconds - ((hours * 60f * 60f) + (minutes * 60)) );
-		int ms = (int) (1000f * ( totalSeconds - ( (hours * 60f * 60f) + (minutes * 60) + seconds )));
-
-		//return hours + ":" + minutes + ":" + seconds + "." + ms;
+	public static string GetTimeStringFromTotalSeconds(float totalSeconds, bool includeMs) 
+	{
+		int hours = (int)(totalSeconds / (60f * 60f));
+		int minutes = (int)((totalSeconds - (hours * 60f * 60f)) / 60f);
+		int seconds = (int)(totalSeconds - ((hours * 60f * 60f) + (minutes * 60)));
+		int ms = (int)(1000f * (totalSeconds - ((hours * 60f * 60f) + (minutes * 60) + seconds)));
 
 		return FormatHours(hours) + FormatMinutes(hours, minutes) + FormatSeconds(hours, minutes, seconds) + (includeMs ? FormatMilliseconds(ms) : "");
 	}
@@ -131,14 +133,15 @@ public class Victory : MonoBehaviour
 		voidSound.volume = Mathf.Min(voidVolume, voidSound.volume + (fadeSpeed * voidVolume * dt));
 	}
 
-	public void GoToMainMenuScene()
+	public void GoToMainMenuSceneAndDeleteSave()
 	{
 		musicSource.volume = endMusicVolume; // reset the music volume
 		musicSource.Play(); // restart the music
+		StaticValues.nukeTheSave = true; // lets the main menu scene know to delete the save (deleting from the gameplay scene is currently inconsistent)
 		SceneManager.LoadScene(0);
 	}
 
-	private string FormatHours(int hours)
+	private static string FormatHours(int hours)
 	{
 		if (hours > 0)
 		{
@@ -150,7 +153,7 @@ public class Victory : MonoBehaviour
 		}
 	}
 
-	private string FormatMinutes(int hours, int minutes)
+	private static string FormatMinutes(int hours, int minutes)
 	{
 		if (minutes > 0)
 		{
@@ -176,7 +179,7 @@ public class Victory : MonoBehaviour
 		}
 	}
 
-	private string FormatSeconds(int hours, int minutes, int seconds)
+	private static string FormatSeconds(int hours, int minutes, int seconds)
 	{
 		if (seconds > 0)
 		{
@@ -202,7 +205,7 @@ public class Victory : MonoBehaviour
 		}
 	}
 
-	private string FormatMilliseconds(float ms)
+	private static string FormatMilliseconds(float ms)
 	{
 		if (ms < 10)
 		{
