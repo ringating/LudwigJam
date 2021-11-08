@@ -21,6 +21,8 @@ public class Cannon : MonoBehaviour
 
     private Stack<CannonBall> readyToReuse = new Stack<CannonBall>();
 
+    public bool mute;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -50,7 +52,7 @@ public class Cannon : MonoBehaviour
 
     private void FireCannon()
     {
-        audioSource.PlayOneShot(shotSound);
+        if (!mute) audioSource.PlayOneShot(shotSound);
 
         CannonBall ball = GetNewCannonBall();
         ball.lifeTime = projectileLife;
