@@ -17,6 +17,9 @@ public class PauseMenu : MonoBehaviour
     public GameObject mainMenuButton;
     public GameObject mainMenuScreen;
 
+    public GameObject graphicsButton;
+    public GameObject graphicsScreen;
+
     private float defaultSens = 1f;
 
     public bool paused { get { return toToggle.activeSelf; } }
@@ -34,6 +37,7 @@ public class PauseMenu : MonoBehaviour
         AudioListener.volume = SettingsStatic.volume; // cant remember if this is done elsewhere too, but can't hurt
         sensitivityInput.text = "" + SettingsStatic.sensitivity;
         MaybeEnableGameplayOnlyUI();
+        MaybeEnableGraphicsButton();
     }
 
 	void Update()
@@ -165,5 +169,27 @@ public class PauseMenu : MonoBehaviour
     public void ForceSavePlayerPrefs()
     {
         PlayerPrefs.Save();
+    }
+
+    private void MaybeEnableGraphicsButton()
+    {
+        if (Application.platform != RuntimePlatform.WebGLPlayer)
+        {
+            graphicsButton.SetActive(true);
+        }
+    }
+
+    public void ShowGraphicsScreen()
+    {
+        graphicsScreen.SetActive(true);
+
+        ApplyGraphicsSettings a = graphicsScreen.GetComponent<ApplyGraphicsSettings>();
+        a.UpdateResolutionOptions();
+        a.SetDropdownsToMatchCurrentSettings();
+    }
+
+    public void HideGraphicsScreen()
+    {
+        graphicsScreen.SetActive(false);
     }
 }
