@@ -25,7 +25,7 @@ public class MatchPlayerPosWithinBounds : MonoBehaviour
             Mathf.Clamp(player.transform.position.z, lower.z, upper.z)
         );
 
-        print(transform.position);
+        //print(transform.position);
     }
 
     private Vector3 GetLowerCorner()
