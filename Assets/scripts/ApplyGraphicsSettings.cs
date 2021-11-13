@@ -78,10 +78,13 @@ public class ApplyGraphicsSettings : MonoBehaviour
         }
 
         resolutionDropdown.value = GetClosestResolutionIndex();
+
+        vsyncToggle.isOn = QualitySettings.vSyncCount > 0;
     }
 
     private int GetClosestResolutionIndex()
     {
+        print(Screen.currentResolution.ToString());
         for (int i = 0; i < resolutions.Length; ++i)
         {
             if (resolutions[i].width == Screen.currentResolution.width &&

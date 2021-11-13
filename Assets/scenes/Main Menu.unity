@@ -726,13 +726,13 @@ RectTransform:
   - {fileID: 1235132028}
   - {fileID: 1976492213}
   - {fileID: 1156447947}
+  - {fileID: 2104581005}
   - {fileID: 1294188295}
   - {fileID: 563198474}
   - {fileID: 1526162336}
   - {fileID: 902567080}
   - {fileID: 1837218941}
   - {fileID: 2145618273}
-  - {fileID: 2104581005}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1273,7 +1273,7 @@ RectTransform:
   m_Children:
   - {fileID: 364532740}
   m_Father: {fileID: 363111790}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1943,7 +1943,7 @@ RectTransform:
   - {fileID: 461437345}
   - {fileID: 547519985}
   m_Father: {fileID: 363111790}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2666,7 +2666,7 @@ RectTransform:
   m_Children:
   - {fileID: 2143691645}
   m_Father: {fileID: 363111790}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3143,7 +3143,7 @@ RectTransform:
   - {fileID: 115972909}
   - {fileID: 122417447}
   m_Father: {fileID: 363111790}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3736,7 +3736,7 @@ RectTransform:
   m_LocalScale: {x: 0.62429243, y: 0.62429243, z: 0.62429243}
   m_Children: []
   m_Father: {fileID: 363111790}
-  m_RootOrder: 10
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -3989,7 +3989,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 363111790}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -4106,7 +4106,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3855451398808715457, guid: 7a23e973df0be9b49b7685cfcbeb1b06, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3855451398808715457, guid: 7a23e973df0be9b49b7685cfcbeb1b06, type: 3}
       propertyPath: m_AnchorMax.x
