@@ -56530,8 +56530,8 @@ MonoBehaviour:
   cam: {fileID: 963194227}
   analogInvertX: 0
   analogInvertY: 0
-  analogSensitivityX: 400
-  analogSensitivityY: 400
+  analogSensitivityX: 350
+  analogSensitivityY: 350
   mouseInvertX: 0
   mouseInvertY: 0
   mouseSensitivityX: 1

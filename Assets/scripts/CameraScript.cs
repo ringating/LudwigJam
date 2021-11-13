@@ -45,13 +45,19 @@ public class CameraScript : MonoBehaviour
         mouseSensitivityX = SettingsStatic.sensitivity;
         mouseSensitivityY = SettingsStatic.sensitivity;
 
-        if (useController)
+        /*if (useController)
         {
             AnalogMoveCamera();
         }
         else
         {
             if (!GlobalObjects.pauseMenuStatic.paused) MouseMoveCamera();
+        }*/
+
+        if (!GlobalObjects.pauseMenuStatic.paused)
+        {
+            AnalogMoveCamera();
+            MouseMoveCamera();
         }
 
         if (!GlobalObjects.pauseMenuStatic.paused) rotatingFocalPointParent.localRotation = GetCameraRotation();
